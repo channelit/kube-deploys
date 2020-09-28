@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: kafka2
+  name: kafka2
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: kafka2
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: kafka2
+    spec:
+      containers:
+        - image: cithub/kafka
+          imagePullPolicy: Always
+          name: kafka2
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          ports:
+            - name: server
+              containerPort: 9092
+              protocol: TCP
+            - name: leader-election
+              containerPort: 9092
+              protocol: TCP
+          volumeMounts:
+            - name: kafka2-volume
+              mountPath: /conf
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: kafka2-volume
+          persistentVolumeClaim:
+            claimName: kafka2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: kafka2
+  name: kafka2
+  namespace: kafka
+spec:
+  ports:
+    - name: client
+      port: 9092
+      protocol: TCP
+      targetPort: 9092
+  selector:
+    run: kafka2
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka2
+  labels:
+    run: kafka2
+  namespace: kafka
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/kafka/config/kafka2"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka2
+  namespace: kafka
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
