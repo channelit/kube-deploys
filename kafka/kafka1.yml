@@ -30,9 +30,9 @@ spec:
           terminationMessagePolicy: File
           ports:
             - name: server
-              containerPort: 9092
+              containerPort: 29092
               protocol: TCP
-            - name: leader-election
+            - name: client
               containerPort: 9092
               protocol: TCP
           volumeMounts:
@@ -58,15 +58,16 @@ metadata:
 spec:
   ports:
     - name: client
+      port: 29092
+      protocol: TCP
+      targetPort: 29092
+    - name: external
       port: 9092
       protocol: TCP
       targetPort: 9092
   selector:
     run: kafka1
-  sessionAffinity: None
-  type: ClusterIP
-status:
-  loadBalancer: {}
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolume

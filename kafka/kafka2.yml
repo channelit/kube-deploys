@@ -32,8 +32,8 @@ spec:
             - name: server
               containerPort: 9092
               protocol: TCP
-            - name: leader-election
-              containerPort: 9092
+            - name: client
+              containerPort: 30092
               protocol: TCP
           volumeMounts:
             - name: kafka2-volume
@@ -61,12 +61,10 @@ spec:
       port: 9092
       protocol: TCP
       targetPort: 9092
+      nodePort: 30092
   selector:
     run: kafka2
-  sessionAffinity: None
-  type: ClusterIP
-status:
-  loadBalancer: {}
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolume
