@@ -17,7 +17,7 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
+      name: kakfa1
       labels:
         run: kafka3
     spec:
@@ -30,10 +30,16 @@ spec:
           terminationMessagePolicy: File
           ports:
             - name: server
+              containerPort: 29092
+              protocol: TCP
+            - name: client1
+              containerPort: 9091
+              protocol: TCP
+            - name: client2
               containerPort: 9092
               protocol: TCP
-            - name: client
-              containerPort: 30093
+            - name: client3
+              containerPort: 9093
               protocol: TCP
           volumeMounts:
             - name: kafka3-volume
@@ -57,11 +63,20 @@ metadata:
   namespace: kafka
 spec:
   ports:
+  ports:
     - name: client
-      port: 9092
+      port: 29092
       protocol: TCP
-      targetPort: 9092
-      nodePort: 30093
+      targetPort: 29092
+    # - name: external1
+    #   port: 9091
+    #   protocol: TCP
+    # - name: external2
+    #   port: 9092
+    #   protocol: TCP
+    - name: external3
+      port: 9093
+      protocol: TCP
   selector:
     run: kafka3
   type: LoadBalancer
