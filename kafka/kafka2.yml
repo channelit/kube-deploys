@@ -41,6 +41,9 @@ spec:
             - name: client3
               containerPort: 9093
               protocol: TCP
+            - name: client-outside
+              containerPort: 30092
+              protocol: TCP
           volumeMounts:
             - name: kafka2-volume
               mountPath: /conf
@@ -63,22 +66,45 @@ metadata:
   namespace: kafka
 spec:
   ports:
-    - name: client
-      port: 29092
-      protocol: TCP
-      targetPort: 29092
-    # - name: external1
-    #   port: 9091
-    #   protocol: TCP
     - name: external2
-      port: 9092
+      port: 30092
       protocol: TCP
-    # - name: external3
-    #   port: 9093
-    #   protocol: TCP
+      targetPort: 30092
+      # nodePort: 30092
   selector:
     run: kafka2
   type: LoadBalancer
+---
+# apiVersion: networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#   name: kafka2-ingress
+#   namespace: kafka
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - host: kafka2.kubernetes.docker.internal
+#     http:
+#       paths:
+#       - backend:
+#           serviceName: kafka2
+#           servicePort: 9092
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: kafka2-ingress
+#   namespace: kafka
+#   annotations:
+#     kubernetes.io/ingress.class: nginx
+# spec:
+#   rules:
+#     - host: kafka2.local
+#       http:
+#         paths:
+#           - backend:
+#               serviceName: kafka2
+#               servicePort: 9092
+#             path: /
 ---
 apiVersion: v1
 kind: PersistentVolume
