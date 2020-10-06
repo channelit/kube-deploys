@@ -81,7 +81,7 @@ spec:
   selector:
     run: zoo1
   sessionAffinity: None
-  type: ClusterIP
+  type: LoadBalancer
 status:
   loadBalancer: {}
 ---
