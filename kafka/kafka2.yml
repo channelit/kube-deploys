@@ -67,10 +67,9 @@ metadata:
 spec:
   ports:
     - name: external2
-      port: 30092
+      port: 9092
       protocol: TCP
-      targetPort: 30092
-      # nodePort: 30092
+      targetPort: 9092
   selector:
     run: kafka2
   type: LoadBalancer

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx
+  namespace: ingress-nginx
+spec:
+  externalTrafficPolicy: Local
+  ports:
+  - name: http
+    nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: proxied-tcp-9000
+    nodePort: 30900
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  - name: proxied-tcp-9001
+    nodePort: 30901
+    port: 30091
+    protocol: TCP
+    targetPort: 30091
+  - name: proxied-tcp-9002
+    nodePort: 30902
+    port: 30092
+    protocol: TCP
+    targetPort: 30092
+  - name: proxied-tcp-9003
+    nodePort: 30903
+    port: 30093
+    protocol: TCP
+    targetPort: 30093
+  selector:
+    app: ingress-nginx
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

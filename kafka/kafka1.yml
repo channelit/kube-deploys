@@ -41,9 +41,6 @@ spec:
             - name: client3
               containerPort: 9093
               protocol: TCP
-            - name: client-outside
-              containerPort: 30091
-              protocol: TCP
           volumeMounts:
             - name: kafka1-volume
               mountPath: /conf
@@ -66,12 +63,10 @@ metadata:
   namespace: kafka
 spec:
   ports:
-  ports:
     - name: external1
-      port: 30091
+      port: 9091
       protocol: TCP
-      targetPort: 30091
-      # nodePort: 30091
+      targetPort: 9091
   selector:
     run: kafka1
   type: LoadBalancer
