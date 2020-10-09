@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: solr1
+  name: solr1
+  namespace: solr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: solr1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: kakfa1
+      labels:
+        run: solr1
+    spec:
+      containers:
+        - image: cithub/solr
+          imagePullPolicy: Always
+          name: solr1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          command: ["/opt/solr/solr-entrypoint.sh", "./bin/solr", "start", "-f", "-c", "-z", "zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/solr"]
+          env:
+            - name: SOLR_CONF
+              value: /solr_conf
+            - name: SOLR_LOGS_DIR
+              value: /solr_mnt
+            - name: SOLR_HOME
+              value: /solr_mnt
+            - name: SOLR_INIT
+              value: "true"
+            - name: SOLR_HOST
+              value: solr1.solr
+            - name: ZK_HOST
+              value: zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181
+          ports:
+            - name: server
+              containerPort: 8983
+              protocol: TCP
+          volumeMounts:
+            - name: solr1-data-volume
+              mountPath: /solr_mnt
+            - name: solr1-conf-volume
+              mountPath: /solr_conf
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: solr1-data-volume
+          persistentVolumeClaim:
+            claimName: solr1-data
+        - name: solr1-conf-volume
+          persistentVolumeClaim:
+            claimName: solr1-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: solr1
+  name: solr1
+  namespace: solr
+spec:
+  ports:
+    - name: external1
+      port: 8983
+      protocol: TCP
+      targetPort: 8983
+      nodePort: 30081
+  selector:
+    run: solr1
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: solr1-data
+  labels:
+    run: solr1
+  namespace: solr
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/solr/data/solr1"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: solr1-data
+  namespace: solr
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: solr1-conf
+  labels:
+    run: solr1
+  namespace: solr
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/solr/config/solr1"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: solr1-conf
+  namespace: solr
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
