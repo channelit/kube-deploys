@@ -28,6 +28,9 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          env:
+            - name: JMX_PORT
+              value: "9998"
           ports:
             - name: server
               containerPort: 29092
