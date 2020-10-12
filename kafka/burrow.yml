@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: burrow
+  name: burrow
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: burrow
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: burrow
+      labels:
+        run: burrow
+    spec:
+      containers:
+        - image: cithub/burrow
+          imagePullPolicy: Always
+          name: kafka1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: JMX_PORT
+              value: "9998"
+          ports:
+            - name: server
+              containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - name: burrow-config
+              mountPath: /etc/burrow/
+            - name: burrow-data
+              mountPath: /var/tmp/burrow
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: burrow-config
+          persistentVolumeClaim:
+            claimName: burrow-config
+        - name: burrow-data
+          persistentVolumeClaim:
+            claimName: burrow-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: burrow
+  name: burrow
+  namespace: kafka
+spec:
+  ports:
+    - name: burrow
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    run: burrow
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: burrow-config
+  labels:
+    run: burrow
+  namespace: kafka
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/kafka/config/burrow"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: burrow-config
+  namespace: kafka
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: burrow-data
+  labels:
+    run: burrow
+  namespace: kafka
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/kafka/data/burrow"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: burrow-data
+  namespace: kafka
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
