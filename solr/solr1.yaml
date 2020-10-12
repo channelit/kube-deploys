@@ -36,10 +36,10 @@ spec:
               value: /solr_mnt
             - name: SOLR_HOME
               value: /solr_mnt
-            - name: SOLR_INIT
-              value: "true"
+            # - name: SOLR_INIT
+            #   value: "true"
             - name: SOLR_HOST
-              value: solr1.solr
+              value: solr1.solr.svc.cluster.local
             - name: ZK_HOST
               value: zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181
           ports:
