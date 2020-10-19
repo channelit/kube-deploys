@@ -3,25 +3,16 @@ servers=[ "zoo1.zookeeper.svc.cluster.local:2181", "zoo2.zookeeper.svc.cluster.l
 timeout=6
 root-path="/burrow"
 
-[cluster.local]
+[cluster.zoo]
 class-name="kafka"
-servers=[ "kafka2.kafka.svc.cluster.local:29092" ]
+servers=[ "kafka2.kafka:29092" ]
 topic-refresh=60
 offset-refresh=30
 
-[consumer.local]
+[consumer.zoo]
 class-name="kafka"
-cluster="local"
-servers=[ "kafka2.kafka.svc.cluster.local:29092" ]
-group-denylist="^(console-consumer-|python-kafka-consumer-).*$"
-group-allowlist=""
-
-[consumer.local_zk]
-class-name="kafka_zk"
-cluster="local"
-servers=[ "zoo1.zookeeper.svc.cluster.local:2181", "zoo2.zookeeper.svc.cluster.local:2181", "zoo3.zookeeper.svc.cluster.local:2181" ]
-zookeeper-path="/kafka"
-zookeeper-timeout=30
+cluster="zoo"
+servers=[ "kafka2.kafka:29092" ]
 group-denylist="^(console-consumer-|python-kafka-consumer-).*$"
 group-allowlist=""
 

@@ -69,7 +69,11 @@ metadata:
   namespace: kafka
 spec:
   ports:
-    - name: external2
+    - name: internal
+      port: 29092
+      protocol: TCP
+      targetPort: 29092
+    - name: external
       port: 9092
       protocol: TCP
       targetPort: 9092

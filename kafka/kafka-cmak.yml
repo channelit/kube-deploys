@@ -32,9 +32,6 @@ spec:
             - name: ZK_HOSTS
               value: zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/kafka
           ports:
-            - name: zookeeper
-              containerPort: 2181
-              protocol: TCP
             - name: ui
               containerPort: 9000
               protocol: TCP
