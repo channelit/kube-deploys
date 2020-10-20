@@ -46,7 +46,8 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: kafka1-volume
-              mountPath: /conf
+              mountPath: /conf/server.properties
+              subPath: server.properties
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -54,8 +55,8 @@ spec:
       terminationGracePeriodSeconds: 30
       volumes:
         - name: kafka1-volume
-          persistentVolumeClaim:
-            claimName: kafka1
+          configMap:
+            name: kafka1-config
 ---
 apiVersion: v1
 kind: Service
@@ -74,62 +75,32 @@ spec:
     run: kafka1
   type: LoadBalancer
 ---
-# apiVersion: networking.k8s.io/v1beta1
-# kind: Ingress
-# metadata:
-#   name: kafka1-ingress
-#   namespace: kafka
-# spec:
-#   ingressClassName: nginx
-#   rules:
-#   - host: kafka1.kubernetes.docker.internal
-#     http:
-#       paths:
-#       - backend:
-#           serviceName: kafka1
-#           servicePort: 9092
-# apiVersion: extensions/v1beta1
-# kind: Ingress
-# metadata:
-#   name: kafka1-ingress
-#   namespace: kafka
-#   annotations:
-#     kubernetes.io/ingress.class: nginx
-# spec:
-#   rules:
-#     - host: kafka1.local
-#       http:
-#         paths:
-#           - backend:
-#               serviceName: kafka1
-#               servicePort: 9091
-#             path: /
----
 apiVersion: v1
-kind: PersistentVolume
+kind: ConfigMap
 metadata:
-  name: kafka1
-  labels:
-    run: kafka1
+  name: kafka2-config
   namespace: kafka
-spec:
-  storageClassName: hostpath
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/kafka/config/kafka1"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: kafka1
-  namespace: kafka
-spec:
-  storageClassName: hostpath
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
+data:
+  server.properties: |
+      broker.id=1
+      listeners=INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9091
+      advertised.listeners=INTERNAL://:29092,EXTERNAL://localhost:9091
+      inter.broker.listener.name=INTERNAL
+      listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      num.network.threads=9
+      num.io.threads=8
+      socket.send.buffer.bytes=102400
+      socket.receive.buffer.bytes=102400
+      socket.request.max.bytes=104857600
+      log.dirs=/kafka-logs
+      num.partitions=1
+      num.recovery.threads.per.data.dir=3
+      offsets.topic.replication.factor=1
+      transaction.state.log.replication.factor=1
+      transaction.state.log.min.isr=1
+      log.retention.hours=168
+      log.segment.bytes=1073741824
+      log.retention.check.interval.ms=300000
+      zookeeper.connect=zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/kafka
+      zookeeper.connection.timeout.ms=18000
+      group.initial.rebalance.delay.ms=0
