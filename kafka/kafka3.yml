@@ -32,8 +32,14 @@ spec:
             - name: JMX_PORT
               value: "9998"
           ports:
-            - name: server
+            - name: server1
+              containerPort: 29091
+              protocol: TCP
+            - name: server2
               containerPort: 29092
+              protocol: TCP
+            - name: server3
+              containerPort: 29093
               protocol: TCP
             - name: client1
               containerPort: 9091
@@ -70,7 +76,11 @@ metadata:
   namespace: kafka
 spec:
   ports:
-    - name: external3
+    - name: internal
+      port: 29093
+      protocol: TCP
+      targetPort: 9093
+    - name: external
       port: 9093
       protocol: TCP
       targetPort: 9093
@@ -86,7 +96,7 @@ metadata:
 data:
   server.properties: |
       broker.id=3
-      listeners=INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9093
+      listeners=INTERNAL://0.0.0.0:29093,EXTERNAL://0.0.0.0:9093
       advertised.listeners=INTERNAL://:29092,EXTERNAL://localhost:9093
       inter.broker.listener.name=INTERNAL
       listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT

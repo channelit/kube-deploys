@@ -32,8 +32,14 @@ spec:
             - name: JMX_PORT
               value: "9998"
           ports:
-            - name: server
+            - name: server1
+              containerPort: 29091
+              protocol: TCP
+            - name: server2
               containerPort: 29092
+              protocol: TCP
+            - name: server3
+              containerPort: 29093
               protocol: TCP
             - name: client1
               containerPort: 9091
@@ -67,23 +73,27 @@ metadata:
   namespace: kafka
 spec:
   ports:
-    - name: external1
+    - name: inernal
+      port: 29091
+      protocol: TCP
+      targetPort: 29091
+    - name: external
       port: 9091
       protocol: TCP
       targetPort: 9091
   selector:
     run: kafka1
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kafka2-config
+  name: kafka1-config
   namespace: kafka
 data:
   server.properties: |
       broker.id=1
-      listeners=INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9091
+      listeners=INTERNAL://0.0.0.0:29091,EXTERNAL://0.0.0.0:9091
       advertised.listeners=INTERNAL://:29092,EXTERNAL://localhost:9091
       inter.broker.listener.name=INTERNAL
       listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT

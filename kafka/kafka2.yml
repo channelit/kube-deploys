@@ -32,8 +32,14 @@ spec:
             - name: JMX_PORT
               value: "9998"
           ports:
-            - name: server
+            - name: server1
+              containerPort: 29091
+              protocol: TCP
+            - name: server2
               containerPort: 29092
+              protocol: TCP
+            - name: server3
+              containerPort: 29093
               protocol: TCP
             - name: client1
               containerPort: 9091
