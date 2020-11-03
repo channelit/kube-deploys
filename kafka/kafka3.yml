@@ -17,7 +17,7 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: kakfa1
+      name: kakfa3
       labels:
         run: kafka3
     spec:
@@ -79,7 +79,7 @@ spec:
     - name: internal
       port: 29093
       protocol: TCP
-      targetPort: 9093
+      targetPort: 29093
     - name: external
       port: 9093
       protocol: TCP
@@ -97,7 +97,7 @@ data:
   server.properties: |
       broker.id=3
       listeners=INTERNAL://0.0.0.0:29093,EXTERNAL://0.0.0.0:9093
-      advertised.listeners=INTERNAL://:29092,EXTERNAL://localhost:9093
+      advertised.listeners=INTERNAL://kafka3:29093,EXTERNAL://kafka3:9093
       inter.broker.listener.name=INTERNAL
       listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       num.network.threads=9

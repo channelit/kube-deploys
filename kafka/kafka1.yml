@@ -83,7 +83,7 @@ spec:
       targetPort: 9091
   selector:
     run: kafka1
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -94,7 +94,7 @@ data:
   server.properties: |
       broker.id=1
       listeners=INTERNAL://0.0.0.0:29091,EXTERNAL://0.0.0.0:9091
-      advertised.listeners=INTERNAL://:29092,EXTERNAL://localhost:9091
+      advertised.listeners=INTERNAL://kafka1:29091,EXTERNAL://kafka1:9091
       inter.broker.listener.name=INTERNAL
       listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       num.network.threads=9

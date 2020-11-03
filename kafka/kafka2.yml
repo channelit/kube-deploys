@@ -17,7 +17,7 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: kakfa1
+      name: kakfa2
       labels:
         run: kafka2
     spec:
@@ -97,7 +97,7 @@ data:
   server.properties: |
       broker.id=2
       listeners=INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
-      advertised.listeners=INTERNAL://:29092,EXTERNAL://localhost:9092
+      advertised.listeners=INTERNAL://kafka2:29092,EXTERNAL://kafka2:9092
       inter.broker.listener.name=INTERNAL
       listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       num.network.threads=9
