@@ -38,7 +38,7 @@ spec:
           terminationMessagePolicy: File
           env:
             - name: KAFKA_BROKERCONNECT
-              value: "kafka1:9091,kafka2:9092,kafka3:9093"
+              value: "kafka1:39091,kafka2:39092,kafka3:39093"
             - name: JVM_OPTS
               value: "-Xms32M -Xmx64M"
             - name: SERVER_SERVLET_CONTEXTPATH

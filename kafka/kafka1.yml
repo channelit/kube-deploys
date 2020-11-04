@@ -81,6 +81,10 @@ spec:
       port: 9091
       protocol: TCP
       targetPort: 9091
+    - name: ui
+      port: 39091
+      protocol: TCP
+      targetPort: 39091
   selector:
     run: kafka1
   type: LoadBalancer
@@ -93,10 +97,10 @@ metadata:
 data:
   server.properties: |
       broker.id=1
-      listeners=INTERNAL://0.0.0.0:29091,EXTERNAL://0.0.0.0:9091
-      advertised.listeners=INTERNAL://kafka1:29091,EXTERNAL://kafka1:9091
+      listeners=INTERNAL://0.0.0.0:29091,EXTERNAL://0.0.0.0:9091,UI://0.0.0.0:39091
+      advertised.listeners=INTERNAL://kafka1:29091,EXTERNAL://localhost:9091,UI://kafka1:39091
       inter.broker.listener.name=INTERNAL
-      listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,UI:PLAINTEXT
       num.network.threads=9
       num.io.threads=8
       socket.send.buffer.bytes=102400
