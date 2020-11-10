@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: kafka-connect
+  name: kafka-connect
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: kafka-connect
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: kafka-connect
+    spec:
+      containers:
+        - image: confluentinc/cp-kafka-connect-base
+          imagePullPolicy: Always
+          name: kafka-connect
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: CONNECT_BOOTSTRAP_SERVERS
+              value: kafka1:39091,kafka2:39092,kafka3:39093
+          ports:
+            - name: ui
+              containerPort: 8082
+              protocol: TCP
+          volumeMounts:
+            - name: kafka-connect-volume
+              mountPath: /etc/kafka-connect/kafka-connect.properties
+              subPath: kafka-connect.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: kafka-connect-volume
+          configMap:
+            name: kafka-connect-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: kafka-connect
+  name: kafka-connect
+  namespace: kafka
+spec:
+  ports:
+    - name: rest
+      port: 8082
+      protocol: TCP
+      targetPort: 8082
+  selector:
+    run: kafka-connect
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-connect-config
+  namespace: kafka
+data:
+  server.properties: |
+      bootstrap.servers=kafka1:39091,kafka2:39092,kafka3:39093
+      config.storage.topic=default.config
+      group.id=default
+      internal.key.converter.schemas.enable=false
+      internal.key.converter=org.apache.kafka.connect.json.JsonConverter
+      internal.value.converter.schemas.enable=false
+      internal.value.converter=org.apache.kafka.connect.json.JsonConverter
+      key.converter=org.apache.kafka.connect.json.JsonConverter
+      offset.storage.topic=default.offsets
+      rest.advertised.host.name=kafka-connect
+      rest.port=8082
+      status.storage.topic=default.status
+      value.converter=org.apache.kafka.connect.json.JsonConverter
+      zookeeper.connect=zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/kafka-connect
