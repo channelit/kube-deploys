@@ -23,6 +23,12 @@ spec:
     spec:
       containers:
         - image: cithub/kafka
+          env:
+            - name: broker
+              valueFrom:
+                secretKeyRef:
+                  name: broker
+                  key: broker
           imagePullPolicy: Always
           name: kafka-connect
           command: ["./opt/kafka/bin/connect-distributed.sh", "/conf/worker.properties"]
@@ -46,6 +52,9 @@ spec:
         - name: kafka-connect-volume
           configMap:
             name: kafka-connect-config
+        - name: broker
+          secret:
+            secretName: broker
 ---
 apiVersion: v1
 kind: Service
@@ -73,7 +82,7 @@ metadata:
 data:
   worker.properties: |
       group.id=workers
-      bootstrap.servers=kafka1:39091,kafka2:39092,kafka3:39093
+      bootstrap.servers=${broker}
       key.converter=org.apache.kafka.connect.json.JsonConverter
       value.converter=org.apache.kafka.connect.json.JsonConverter
       plugin.path=/plugins/
@@ -82,4 +91,12 @@ data:
       offset.storage.topic=worker-offset
       status.storage.topic=worker-status
       heartbeat.interval.ms=5000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: broker
+data:
+  broker: a2Fma2ExOjM5MDkxLGthZmthMjozOTA5MixrYWZrYTM6MzkwOTM=
+#echo -n 'kafka1:39091,kafka2:39092,kafka3:39093' | base64
 
