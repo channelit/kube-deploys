@@ -91,12 +91,3 @@ data:
       offset.storage.topic=worker-offset
       status.storage.topic=worker-status
       heartbeat.interval.ms=5000
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: broker
-data:
-  broker: a2Fma2ExOjM5MDkxLGthZmthMjozOTA5MixrYWZrYTM6MzkwOTM=
-#echo -n 'kafka1:39091,kafka2:39092,kafka3:39093' | base64
-

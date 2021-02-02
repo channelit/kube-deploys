@@ -1,3 +1,14 @@
+
+
+### Highlights
+
+* 
+- Kubernetes deployment
+- Using Apache Kakfa downloaded from open source project
+- Separate namespaces for Kafka and Zookeeper
+- 3 node Zookeeper and 3 node Kafak
+* 
+
 ```
 kubectl create namespace kafka
 kubectl apply -f ./ -n kafka
