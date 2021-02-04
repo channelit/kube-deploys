@@ -1,0 +1,132 @@
+##################################################################################################
+# Keycloak
+##################################################################################################
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keycloak
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+  labels:
+    name: keycloak
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      namespace: keycloak
+      name: keycloak
+      labels:
+        app: keycloak
+        name: keycloak
+    spec:
+      containers:
+      - name: keycoak
+        image: jboss/keycloak:latest
+        imagePullPolicy: Never
+        env:
+          - name: KEYCLOAK_USER
+            value: admin
+          - name: KEYCLOAK_PASSWORD
+            value: admin
+          - name: DB_VENDOR
+            value: h2
+          - name: KEYCLOAK_IMPORT
+            value: /keycloak/realm.json
+          - name: PROXY_ADDRESS_FORWARDING
+            value: "true"
+        volumeMounts:
+          - name: keycloak-realm
+            mountPath: /keycloak/realm.json
+            subPath: realm.json
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+      volumes:
+        - name: keycloak-realm
+          configMap:
+            name: keycloak-realm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: keycloak
+  labels:
+    name: keycloak
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    name: keycloak
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm
+  namespace: keycloak
+data:
+  realm.json: |
+    {
+      "realm": "envoy",
+      "enabled": true,
+      "users": [
+        {
+          "username": "user",
+          "enabled": true,
+          "credentials": [
+            {
+              "type": "password",
+              "value": "user"
+            }
+          ],
+          "realmRoles": [
+            "user"
+          ],
+          "clientRoles": {
+            "account": [
+              "manage-account"
+            ]
+          }
+        }
+      ],
+      "roles": {
+        "realm": [
+          {
+            "name": "user",
+            "description": "User privileges"
+          },
+          {
+            "name": "admin",
+            "description": "Administrator privileges"
+          }
+        ]
+      },
+      "defaultRoles": [
+        "user"
+      ],
+      "clients": [
+        {
+          "clientId": "envoy",
+          "enabled": true,
+          "publicClient": true,
+          "directAccessGrantsEnabled": true,
+          "redirectUris": [
+            "*"
+          ],
+          "webOrigins": [
+            "*"
+          ]
+        }
+      ]
+    }

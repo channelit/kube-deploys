@@ -20,7 +20,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 
 #### Using GCP via Docker
 
-### Create Kube Cluster
+#### Create Kube Cluster
 ```
 docker run -ti -d -e CLOUDSDK_CONFIG=/config/mygcloud -v `pwd`/mygcloud:/config/mygcloud -v `pwd`:/certs -v /Users/hardikpatel/workbench/projects/cit/kube-deploys:/kube-deploys --name=gcloud google/cloud-sdk /bin/bash 
 docker attach gcloud
@@ -30,10 +30,4 @@ apt-get install kubectl
 gcloud config set compute/zone us-east4-a
 gcloud container clusters create cluster-cits --num-nodes=3
 gcloud container clusters get-credentials
-```
-### Install Istio in container and in Kube
-```
-curl -L https://git.io/getLatestIstio | ISTIO_VERSION=1.2.5 sh -
-istioctl install
-
 ```
