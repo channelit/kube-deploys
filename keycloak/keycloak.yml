@@ -31,7 +31,7 @@ spec:
       containers:
       - name: keycoak
         image: jboss/keycloak:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         env:
           - name: KEYCLOAK_USER
             value: admin
@@ -64,7 +64,9 @@ metadata:
     name: keycloak
 spec:
   ports:
-  - port: 8080
+  - name: keycloak
+    port: 8080
+    protocol: TCP
     targetPort: 8080
   selector:
     name: keycloak
