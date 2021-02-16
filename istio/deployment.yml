@@ -22,7 +22,7 @@ spec:
         run: istio
     spec:
       containers:
-        - image: cithub/kafka-streams
+        - image: tomcat:8.0
           imagePullPolicy: Always
           name: istio
           resources: {}
@@ -44,7 +44,7 @@ metadata:
   labels:
     run: istio
   name: istio
-  namespace: kafka
+  namespace: istio
 spec:
   ports:
     - name: istio

@@ -1,5 +1,7 @@
 #### Install Istio in container and in Kube
 ```
-curl -L https://git.io/getLatestIstio | ISTIO_VERSION=1.2.5 sh -
-istioctl install
+curl -L https://istio.io/downloadIstio | sh -
+cd istio-1.9.0
+export PATH=$PWD/bin:$PATH
+$ istioctl install --set profile=demo -y
 ```
