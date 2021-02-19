@@ -1,0 +1,105 @@
+##################################################################################################
+# ClamAV
+##################################################################################################
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: clamav
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clamav
+  namespace: clamav
+  labels:
+    name: clamav
+    app: clamav
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clamav
+  template:
+    metadata:
+      namespace: clamav
+      name: clamav
+      labels:
+        app: clamav
+        name: clamav
+    spec:
+      containers:
+      - name: clamav
+        image: clamav
+        imagePullPolicy: Never
+        env:
+          - name: USER
+            value: clamav
+        command: ["freshclam"]
+        volumeMounts:
+          - name: clamav-freshclam
+            mountPath: /usr/local/etc/freshclam.conf
+            subPath: freshclam.conf
+          - name: clamav-clamd
+            mountPath: /usr/local/etc/clamd.conf
+            subPath: clamd.conf
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+      volumes:
+        - name: clamav-freshclam
+          configMap:
+            name: clamav-freshclam
+        - name: clamav-clamd
+          configMap:
+            name: clamav-clamd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clamav
+  namespace: clamav
+  labels:
+    name: clamav
+spec:
+  ports:
+  - name: clamav
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    name: clamav
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clamav-freshclam
+  namespace: clamav
+data:
+  freshclam.conf: |
+      DatabaseDirectory /var/lib/clamav
+      LogTime yes
+      LogVerbose yes
+      LogSyslog no
+      DatabaseOwner clamav
+      DatabaseMirror db.uk.clamav.net
+      DatabaseMirror database.clamav.net
+      Foreground yes
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clamav-clamd
+  namespace: clamav
+data:
+  clamd.conf: |
+      LogFile /dev/stdout
+      LogTime yes
+      LogClean yes
+      LogSyslog no
+      LogVerbose yes
+      DatabaseDirectory /var/lib/clamav
+      LocalSocket /var/run/clamav/clamd.socket
+      TCPSocket 3310
+      Foreground yes

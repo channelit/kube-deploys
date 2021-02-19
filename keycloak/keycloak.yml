@@ -29,7 +29,7 @@ spec:
         name: keycloak
     spec:
       containers:
-      - name: keycoak
+      - name: keycloak
         image: jboss/keycloak:latest
         imagePullPolicy: Always
         env:
