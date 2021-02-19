@@ -35,7 +35,7 @@ spec:
         env:
           - name: USER
             value: clamav
-        command: ["freshclam"]
+        command: ["/bin/sh", "-c", "freshclam -d && clamd"]
         volumeMounts:
           - name: clamav-freshclam
             mountPath: /usr/local/etc/freshclam.conf
