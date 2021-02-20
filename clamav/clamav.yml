@@ -35,7 +35,7 @@ spec:
         env:
           - name: USER
             value: clamav
-        command: ["/bin/sh", "-c", "freshclam -d && clamd"]
+        command: ["/bin/sh", "-c", "freshclam -d & (sleep 60; clamd)"]
         volumeMounts:
           - name: clamav-freshclam
             mountPath: /usr/local/etc/freshclam.conf
@@ -44,7 +44,7 @@ spec:
             mountPath: /usr/local/etc/clamd.conf
             subPath: clamd.conf
         ports:
-          - containerPort: 8080
+          - containerPort: 3310
             protocol: TCP
       volumes:
         - name: clamav-freshclam
@@ -64,9 +64,9 @@ metadata:
 spec:
   ports:
   - name: clamav
-    port: 8080
+    port: 3310
     protocol: TCP
-    targetPort: 8080
+    targetPort: 3310
   selector:
     name: clamav
   type: LoadBalancer
