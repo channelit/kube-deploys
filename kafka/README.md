@@ -8,6 +8,13 @@
 - 3 node Zookeeper and 3 node Kafak
 * 
 
+### Start Zookeeper cluster (from ../zookeeper)
+```
+kubectl create namespace zookeeper
+kubectl apply -f ./ -n zookeeper
+```
+
+### Start Kafka, Kafdrop, kafka-connect
 ```
 kubectl create namespace kafka
 kubectl apply -f ./ -n kafka
@@ -16,3 +23,5 @@ kubectl apply -f ./ -n kafka
 ```
 zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/kafka
 ```
+
+### Kafdrop URL : 

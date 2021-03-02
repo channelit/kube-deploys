@@ -30,8 +30,8 @@ spec:
     spec:
       containers:
       - name: clamav
-        image: clamav
-        imagePullPolicy: Never
+        image: cithub/clamav
+        imagePullPolicy: Always
         env:
           - name: USER
             value: clamav
