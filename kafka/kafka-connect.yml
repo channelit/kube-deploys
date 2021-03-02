@@ -23,12 +23,6 @@ spec:
     spec:
       containers:
         - image: cithub/kafka
-          env:
-            - name: broker
-              valueFrom:
-                secretKeyRef:
-                  name: broker
-                  key: broker
           imagePullPolicy: Always
           name: kafka-connect
           command: ["./opt/kafka/bin/connect-distributed.sh", "/conf/worker.properties"]
@@ -52,9 +46,6 @@ spec:
         - name: kafka-connect-volume
           configMap:
             name: kafka-connect-config
-        - name: broker
-          secret:
-            secretName: broker
 ---
 apiVersion: v1
 kind: Service
@@ -82,7 +73,7 @@ metadata:
 data:
   worker.properties: |
       group.id=workers
-      bootstrap.servers=${broker}
+      bootstrap.servers=kafka1:39091,kafka2:39092,kafka3:39093
       key.converter=org.apache.kafka.connect.json.JsonConverter
       value.converter=org.apache.kafka.connect.json.JsonConverter
       plugin.path=/plugins/
