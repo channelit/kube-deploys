@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: elastic1
+  name: elastic1
+  namespace: elastic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: elastic1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: elastic1
+      labels:
+        run: elastic1
+    spec:
+      containers:
+        - image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+          imagePullPolicy: Always
+          name: elastic1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: cluster.name
+              value: "elastic1"
+            - name: ES_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: discovery.seed_hosts
+              value: "elastic2,elastic3"
+            - name: cluster.initial_master_nodes
+              value: "elastic1,elastic2,elastic3"
+            - name: discovery.seed_hosts
+              value: "elastic1, elastic2"
+          ports:
+            - name: server1
+              containerPort: 9200
+              protocol: TCP
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: elastic1-volume
+          configMap:
+            name: elastic1-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: elastic1
+  name: elastic1
+  namespace: elastic
+spec:
+  ports:
+    - name: inernal
+      port: 9200
+      protocol: TCP
+      targetPort: 9200
+  selector:
+    run: elastic1
+  type: LoadBalancer

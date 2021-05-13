@@ -17,7 +17,7 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: kakfa3
+      name: kafka3
       labels:
         run: kafka3
     spec:
