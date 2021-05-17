@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: elastic1
-  name: elastic1
+    run: elastic3
+  name: elastic3
   namespace: elastic
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: elastic1
+      run: elastic3
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -17,48 +17,52 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: elastic1
+      name: elastic3
       labels:
-        run: elastic1
+        run: elastic3
+      namespace: elastic
     spec:
       containers:
         - image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
           imagePullPolicy: Always
-          name: elastic1
+          name: elastic3
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           env:
             - name: cluster.name
-              value: "elastic1"
+              value: "elastic"
+            - name: node.name
+              value: "elastic3"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
             - name: discovery.seed_hosts
-              value: "elastic2,elastic3"
+              value: "elastic1,elastic2"
             - name: cluster.initial_master_nodes
               value: "elastic1,elastic2,elastic3"
-            - name: discovery.seed_hosts
-              value: "elastic1, elastic2"
           ports:
             - name: server1
               containerPort: 9200
               protocol: TCP
+          volumeMounts:
+            - name: elastic3-data
+              mountPath: /usr/share/elasticsearch/data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: elastic1-volume
-          configMap:
-            name: elastic1-config
+        - name: elastic3-data
+          persistentVolumeClaim:
+            claimName: elastic3-data
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    run: elastic1
-  name: elastic1
+    run: elastic3
+  name: elastic3
   namespace: elastic
 spec:
   ports:
@@ -67,5 +71,33 @@ spec:
       protocol: TCP
       targetPort: 9200
   selector:
-    run: elastic1
+    run: elastic3
   type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elastic3-data
+  namespace: elastic
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/elasticsearch/data/elastic3"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elastic3-data
+  namespace: elastic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  volumeName: elastic3-data
+  resources:
+    requests:
+      storage: 1Gi
