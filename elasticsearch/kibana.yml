@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: kibana
+  name: kibana
+  namespace: elastic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: kibana
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: kibana
+      labels:
+        run: kibana
+      namespace: elastic
+    spec:
+      containers:
+        - image: docker.elastic.co/kibana/kibana:7.12.1
+          imagePullPolicy: Always
+          name: kibana
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: '["http://elastic1:9200","http://elastic2:9200","http://elastic3:9200"]'
+          ports:
+            - name: publish
+              containerPort: 5601
+              protocol: TCP
+          # volumeMounts:
+          #   - name: kibana-data
+          #     mountPath: /usr/share/elasticsearch/data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      # volumes:
+      #   - name: kibana-data
+      #     persistentVolumeClaim:
+      #       claimName: kibana-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: kibana
+  name: kibana
+  namespace: elastic
+spec:
+  ports:
+    - name: external
+      port: 5601
+      protocol: TCP
+      targetPort: 5601
+  selector:
+    run: kibana
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kibana-data
+  namespace: elastic
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/elasticsearch/data/kibana"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kibana-data
+  namespace: elastic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  volumeName: kibana-data
+  resources:
+    requests:
+      storage: 1Gi

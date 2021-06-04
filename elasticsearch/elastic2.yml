@@ -34,15 +34,20 @@ spec:
               value: "elastic"
             - name: node.name
               value: "elastic2"
+            - name: network.host
+              value: "0.0.0.0"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
             - name: discovery.seed_hosts
-              value: "elastic1,elastic3"
+              value: "elastic1:9200,elastic2,elastic3"
             - name: cluster.initial_master_nodes
               value: "elastic1,elastic2,elastic3"
           ports:
-            - name: server1
+            - name: publish
               containerPort: 9200
+              protocol: TCP
+            - name: node
+              containerPort: 9300
               protocol: TCP
           volumeMounts:
             - name: elastic2-data
@@ -66,13 +71,17 @@ metadata:
   namespace: elastic
 spec:
   ports:
-    - name: inernal
+    - name: external
       port: 9200
       protocol: TCP
       targetPort: 9200
+    - name: inernal
+      port: 9300
+      protocol: TCP
+      targetPort: 9300
   selector:
     run: elastic2
-  type: LoadBalancer
+  type: NodePort
 ---
 apiVersion: v1
 kind: PersistentVolume
