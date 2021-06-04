@@ -22,13 +22,16 @@ spec:
         run: kafka-connect
     spec:
       containers:
-        - image: cithub/kafka
-          imagePullPolicy: Always
+        - image: debezium
+          imagePullPolicy: Never
           name: kafka-connect
           command: ["./opt/kafka/bin/connect-distributed.sh", "/conf/worker.properties"]
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          env:
+            - name: CLASSPATH
+              value: /connectors/*
           ports:
             - name: rest
               containerPort: 8082
@@ -76,7 +79,7 @@ data:
       bootstrap.servers=kafka1:39091,kafka2:39092,kafka3:39093
       key.converter=org.apache.kafka.connect.json.JsonConverter
       value.converter=org.apache.kafka.connect.json.JsonConverter
-      plugin.path=/plugins/
+      plugin.path=/connectors
       rest.port=8082
       config.storage.topic=worker-config
       offset.storage.topic=worker-offset
