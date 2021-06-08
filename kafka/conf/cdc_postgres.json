@@ -2,7 +2,7 @@
   "name": "cdc-rds",
   "config": {
    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-   "database.hostname": "DATABASE_HOSTNAME,
+   "database.hostname": "DATABASE_HOSTNAME",
    "database.port": "DATABASE_PORT",
    "database.user": "DATABASE_USER",
    "database.password": "DATABASE_PASSWORD",
@@ -12,4 +12,3 @@
    "plugin.name": "wal2json"
   }
 }
-EOF

@@ -25,3 +25,5 @@ zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3
 ```
 
 ### Kafdrop URL : 
+
+### Kafka Connect URL: http://localhost:8082/
