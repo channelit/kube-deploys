@@ -2,13 +2,13 @@
   "name": "cdc-rds",
   "config": {
    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-   "database.hostname": "DATABASE_HOSTNAME",
-   "database.port": "DATABASE_PORT",
-   "database.user": "DATABASE_USER",
-   "database.password": "DATABASE_PASSWORD",
-   "database.dbname": "DATABASE_DBNAME",
-   "database.server.name": "DATABASE_SERVER_NAME",
-   "table.whitelist": "TABLE_WHITELIST",
+   "database.hostname": "postgres.postgres",
+   "database.port": "5432",
+   "database.user": "cits",
+   "database.password": "admin",
+   "database.dbname": "postgres",
+   "database.server.name": "postgres",
+   "table.whitelist": "EMPLOYEE",
    "plugin.name": "wal2json"
   }
 }

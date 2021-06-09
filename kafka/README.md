@@ -27,3 +27,14 @@ zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3
 ### Kafdrop URL : 
 
 ### Kafka Connect URL: http://localhost:8082/
+
+### Kafka Connect for Postgres
+```
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --data @conf/cdc_postgres.json localhost:8082/connectors/
+
+```
+#### Delete Connector
+```
+curl -X DELETE http://localhost:8082/connectors/cdc-rds
+
+```
