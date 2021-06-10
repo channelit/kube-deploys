@@ -38,3 +38,9 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
 curl -X DELETE http://localhost:8082/connectors/cdc-rds
 
 ```
+
+### Broker URL in Kubernetes
+```
+kafka1.kafka.svc.cluster.local:39091,kafka2.kafka.svc.cluster.local:39092,kafka3.kafka.svc.cluster.local:39093
+
+```

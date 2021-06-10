@@ -85,7 +85,7 @@ metadata:
   namespace: druid
 data:
   runtime.properties: |
-      druid.host=druid-historical.druid
+      druid.host=druid-historical
       druid.service=druid/historical
       druid.plaintextPort=8083
 
