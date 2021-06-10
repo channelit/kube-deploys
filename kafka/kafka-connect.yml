@@ -22,7 +22,7 @@ spec:
         run: kafka-connect
     spec:
       containers:
-        - image: connector
+        - image: cithub/kafka
           imagePullPolicy: Never
           name: kafka-connect
           command: ["./opt/kafka/bin/connect-distributed.sh", "/conf/worker.properties"]
