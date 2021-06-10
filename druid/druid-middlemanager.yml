@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: druid-middlemanager
+  name: druid-middlemanager
+  namespace: druid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: druid-middlemanager
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: druid-middlemanager
+      labels:
+        run: druid-middlemanager
+    spec:
+      containers:
+        - image: apache/druid:0.21.1
+          imagePullPolicy: Always
+          name: druid-middlemanager
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          args: ["middleManager"]
+          env:
+            - name: DRUID_SET_HOST
+              value: "druid-middlemanager"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          ports:
+            - name: middlemanager
+              containerPort: 8091
+              protocol: TCP
+          volumeMounts:
+            - name: druid-common-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
+              subPath: common.runtime.properties
+          volumeMounts:
+            - name: middlemanager-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/data/middleManager/runtime.properties
+              subPath: runtime.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: druid-common-runtime-properties
+          configMap:
+            name: druid-common-runtime-properties
+      volumes:
+        - name: middlemanager-runtime-properties
+          configMap:
+            name: middlemanager-runtime-properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: druid-middlemanager
+  name: druid-middlemanager
+  namespace: druid
+spec:
+  ports:
+    - name: inernal
+      port: 8091
+      protocol: TCP
+      targetPort: 8091
+  selector:
+    run: druid-middlemanager
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: middlemanager-runtime-properties
+  namespace: druid
+data:
+  runtime.properties: |
+      druid.host=druid-middlemanager.druid

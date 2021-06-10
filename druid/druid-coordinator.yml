@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: druid-coordinator
+  name: druid-coordinator
+  namespace: druid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: druid-coordinator
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: druid-coordinator
+      labels:
+        run: druid-coordinator
+    spec:
+      containers:
+        - image: apache/druid:0.21.1
+          imagePullPolicy: Always
+          name: druid-coordinator
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          args: ["coordinator"]
+          env:
+            - name: DRUID_SET_HOST
+              value: "druid-coordinator"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          ports:
+            - name: coordinator
+              containerPort: 8081
+              protocol: TCP
+          volumeMounts:
+            - name: druid-common-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
+              subPath: common.runtime.properties
+          volumeMounts:
+            - name: coordinator-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/master/coordinator-overlord/runtime.properties
+              subPath: runtime.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: druid-common-runtime-properties
+          configMap:
+            name: druid-common-runtime-properties
+      volumes:
+        - name: coordinator-runtime-properties
+          configMap:
+            name: coordinator-runtime-properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: druid-coordinator
+  name: druid-coordinator
+  namespace: druid
+spec:
+  ports:
+    - name: inernal
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    run: druid-coordinator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coordinator-runtime-properties
+  namespace: druid
+data:
+  runtime.properties: |
+      druid.host=druid-coordinator.druid
+      druid.service=druid/coordinator
+      druid.plaintextPort=8081
+
+      druid.coordinator.startDelay=PT10S
+      druid.coordinator.period=PT5S
+
+      # Run the overlord service in the coordinator process
+      druid.coordinator.asOverlord.enabled=true
+      druid.coordinator.asOverlord.overlordService=druid/overlord
+
+      druid.indexer.queue.startDelay=PT5S
+
+      druid.indexer.runner.type=remote
+      druid.indexer.storage.type=metadata

@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: druid-broker
+  name: druid-broker
+  namespace: druid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: druid-broker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: druid-broker
+      labels:
+        run: druid-broker
+    spec:
+      containers:
+        - image: apache/druid:0.21.1
+          imagePullPolicy: Always
+          name: druid-broker
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          args: ["broker"]
+          env:
+            - name: DRUID_SET_HOST
+              value: "druid-broker"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          ports:
+            - name: broker
+              containerPort: 8082
+              protocol: TCP
+          volumeMounts:
+            - name: druid-common-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
+              subPath: common.runtime.properties
+          volumeMounts:
+            - name: broker-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/query/broker/runtime.properties
+              subPath: runtime.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: druid-common-runtime-properties
+          configMap:
+            name: druid-common-runtime-properties
+      volumes:
+        - name: broker-runtime-properties
+          configMap:
+            name: broker-runtime-properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: druid-broker
+  name: druid-broker
+  namespace: druid
+spec:
+  ports:
+    - name: inernal
+      port: 8082
+      protocol: TCP
+      targetPort: 8082
+  selector:
+    run: druid-broker
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: broker-runtime-properties
+  namespace: druid
+data:
+  runtime.properties: |
+      druid.host=druid-broker.druid
+      druid.service=druid/broker
+      druid.plaintextPort=8082
+
+      # HTTP server settings
+      druid.server.http.numThreads=60
+
+      # HTTP client settings
+      druid.broker.http.numConnections=50
+      druid.broker.http.maxQueuedBytes=10MiB
+
+      # Processing threads and buffers
+      druid.processing.buffer.sizeBytes=500MiB
+      druid.processing.numMergeBuffers=6
+      druid.processing.numThreads=1
+      druid.processing.tmpDir=var/druid/processing
+
+      # Query cache disabled -- push down caching and merging instead
+      druid.broker.cache.useCache=false
+      druid.broker.cache.populateCache=false

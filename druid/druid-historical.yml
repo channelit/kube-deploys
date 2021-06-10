@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: druid-historical
+  name: druid-historical
+  namespace: druid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: druid-historical
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: druid-historical
+      labels:
+        run: druid-historical
+    spec:
+      containers:
+        - image: apache/druid:0.21.1
+          imagePullPolicy: Always
+          name: druid-historical
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          args: ["historical"]
+          env:
+            - name: DRUID_SET_HOST
+              value: "druid-historical"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          ports:
+            - name: historical
+              containerPort: 8083
+              protocol: TCP
+          volumeMounts:
+            - name: druid-common-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
+              subPath: common.runtime.properties
+          volumeMounts:
+            - name: historical-runtime-properties
+              mountPath: /opt/druid/conf/druid/cluster/data/historical/runtime.properties
+              subPath: runtime.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: druid-common-runtime-properties
+          configMap:
+            name: druid-common-runtime-properties
+      volumes:
+        - name: historical-runtime-properties
+          configMap:
+            name: historical-runtime-properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: druid-historical
+  name: druid-historical
+  namespace: druid
+spec:
+  ports:
+    - name: inernal
+      port: 8083
+      protocol: TCP
+      targetPort: 8083
+  selector:
+    run: druid-historical
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: historical-runtime-properties
+  namespace: druid
+data:
+  runtime.properties: |
+      druid.host=druid-historical.druid
+      druid.service=druid/historical
+      druid.plaintextPort=8083
+
+      # HTTP server threads
+      druid.server.http.numThreads=60
+
+      # Processing threads and buffers
+      druid.processing.buffer.sizeBytes=500MiB
+      druid.processing.numMergeBuffers=4
+      druid.processing.numThreads=15
+      druid.processing.tmpDir=var/druid/processing
+
+      # Segment storage
+      druid.segmentCache.locations=[{"path":"var/druid/segment-cache","maxSize":"300g"}]
+
+      # Query cache
+      druid.historical.cache.useCache=true
+      druid.historical.cache.populateCache=true
+      druid.cache.type=caffeine
+      druid.cache.sizeInBytes=256MiB
