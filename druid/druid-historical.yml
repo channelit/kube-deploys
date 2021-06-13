@@ -129,7 +129,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/historical"
+    path: "/Users/hardikpatel/workbench/projects/kube-deploys/druid"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

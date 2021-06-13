@@ -41,6 +41,6 @@ curl -X DELETE http://localhost:8082/connectors/cdc-rds
 
 ### Broker URL in Kubernetes
 ```
-34.75.129.63:29091,34.75.129.63:29092,34.75.129.63:29093
+localhost:29091,localhost:29092,localhost:29093
 
 ```

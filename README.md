@@ -32,3 +32,10 @@ gcloud config set compute/zone us-east4-a
 gcloud container clusters create cluster-cits --num-nodes=3
 gcloud container clusters get-credentials cluster-cits
 ```
+
+##### Reset Kubernetes Cluster
+```
+rm -rf ~/Library/Group\ Containers/group.com.docker/pki/
+rm -rf ~/.kube
+
+```
