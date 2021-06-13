@@ -17,8 +17,8 @@ metadata:
   namespace: druid
 data:
   environment: |
-      DRUID_XMX=2g
-      DRUID_XMS=2g
+      DRUID_XMX=1g
+      DRUID_XMS=1g
       DRUID_MAXNEWSIZE=250m
       DRUID_NEWSIZE=250m
       DRUID_MAXDIRECTMEMORYSIZE=6172m
@@ -31,7 +31,7 @@ data:
       druid_metadata_storage_connector_user=cits
       druid_metadata_storage_connector_password=admin
       druid_coordinator_balancer_strategy=cachingCost
-      druid_indexer_runner_javaOptsArray=["-server", "-Xmx2g", "-Xms2g", "-XX:MaxDirectMemorySize=2g", "-Duser.timezone=UTC", "-Dfile.encoding=UTF-8", "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"]
+      druid_indexer_runner_javaOptsArray=["-server", "-Xmx1g", "-Xms1g", "-XX:MaxDirectMemorySize=512m", "-Duser.timezone=UTC", "-Dfile.encoding=UTF-8", "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"]
       druid_indexer_fork_property_druid_processing_buffer_sizeBytes=268435456
       druid_storage_type=local
       druid_storage_storageDirectory=/opt/data/segments
@@ -40,3 +40,32 @@ data:
       druid_processing_numThreads=2
       druid_processing_numMergeBuffers=2
       DRUID_LOG4J=<?xml version="1.0" encoding="UTF-8" ?><Configuration status="WARN"><Appenders><Console name="Console" target="SYSTEM_OUT"><PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/></Console></Appenders><Loggers><Root level="info"><AppenderRef ref="Console"/></Root><Logger name="org.apache.druid.jetty.RequestLog" additivity="false" level="DEBUG"><AppenderRef ref="Console"/></Logger></Loggers></Configuration>
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: druid-shared-volume
+  labels:
+    run: druid-broker
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/shared"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-shared-volume
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

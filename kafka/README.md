@@ -30,7 +30,7 @@ zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3
 
 ### Kafka Connect for Postgres
 ```
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --data @conf/cdc_postgres.json localhost:8082/connectors/
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --data @conf/cdc_postgres.json 104.196.166.242/:8082/connectors/
 
 ```
 #### Delete Connector
@@ -41,6 +41,6 @@ curl -X DELETE http://localhost:8082/connectors/cdc-rds
 
 ### Broker URL in Kubernetes
 ```
-kafka1.kafka.svc.cluster.local:39091,kafka2.kafka.svc.cluster.local:39092,kafka3.kafka.svc.cluster.local:39093
+34.75.129.63:29091,34.75.129.63:29092,34.75.129.63:29093
 
 ```

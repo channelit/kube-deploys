@@ -43,10 +43,13 @@ spec:
             - name: druid-common-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
               subPath: common.runtime.properties
-          volumeMounts:
             - name: coordinator-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/master/coordinator-overlord/runtime.properties
               subPath: runtime.properties
+            - name: druid-coordinator-volume
+              mountPath: /opt/druid/var/druid/
+            - name: druid-shared-volume
+              mountPath: /opt/shared
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -56,10 +59,15 @@ spec:
         - name: druid-common-runtime-properties
           configMap:
             name: druid-common-runtime-properties
-      volumes:
         - name: coordinator-runtime-properties
           configMap:
             name: coordinator-runtime-properties
+        - name: druid-coordinator-volume
+          persistentVolumeClaim:
+            claimName: druid-broker-volume
+        - name: druid-shared-volume
+          persistentVolumeClaim:
+            claimName: druid-shared-volume
 ---
 apiVersion: v1
 kind: Service
@@ -100,3 +108,32 @@ data:
 
       druid.indexer.runner.type=remote
       druid.indexer.storage.type=metadata
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: druid-coordinator-volume
+  labels:
+    run: druid-coordinator
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/coordinator"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-coordinator-volume
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

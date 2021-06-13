@@ -43,10 +43,13 @@ spec:
             - name: druid-common-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
               subPath: common.runtime.properties
-          volumeMounts:
             - name: broker-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/query/broker/runtime.properties
               subPath: runtime.properties
+            - name: druid-broker-volume
+              mountPath: /opt/druid/var/druid/
+            - name: druid-shared-volume
+              mountPath: /opt/shared
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -56,10 +59,15 @@ spec:
         - name: druid-common-runtime-properties
           configMap:
             name: druid-common-runtime-properties
-      volumes:
         - name: broker-runtime-properties
           configMap:
             name: broker-runtime-properties
+        - name: druid-broker-volume
+          persistentVolumeClaim:
+            claimName: druid-broker-volume
+        - name: druid-shared-volume
+          persistentVolumeClaim:
+            claimName: druid-shared-volume
 ---
 apiVersion: v1
 kind: Service
@@ -105,3 +113,32 @@ data:
       # Query cache disabled -- push down caching and merging instead
       druid.broker.cache.useCache=false
       druid.broker.cache.populateCache=false
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: druid-broker-volume
+  labels:
+    run: druid-broker
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/broker"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-broker-volume
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

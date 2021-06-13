@@ -43,10 +43,13 @@ spec:
             - name: druid-common-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
               subPath: common.runtime.properties
-          volumeMounts:
             - name: router-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/query/router/runtime.properties
               subPath: runtime.properties
+            - name: druid-router-volume
+              mountPath: /opt/druid/var/druid/
+            - name: druid-shared-volume
+              mountPath: /opt/shared
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -56,10 +59,15 @@ spec:
         - name: druid-common-runtime-properties
           configMap:
             name: druid-common-runtime-properties
-      volumes:
         - name: router-runtime-properties
           configMap:
             name: router-runtime-properties
+        - name: druid-router-volume
+          persistentVolumeClaim:
+            claimName: druid-router-volume
+        - name: druid-shared-volume
+          persistentVolumeClaim:
+            claimName: druid-shared-volume
 ---
 apiVersion: v1
 kind: Service
@@ -101,3 +109,32 @@ data:
 
       # Management proxy to coordinator / overlord: required for unified web console.
       druid.router.managementProxy.enabled=true
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: druid-router-volume
+  labels:
+    run: druid-router
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/router"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-router-volume
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

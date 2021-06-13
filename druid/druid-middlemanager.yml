@@ -43,10 +43,13 @@ spec:
             - name: druid-common-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
               subPath: common.runtime.properties
-          volumeMounts:
             - name: middlemanager-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/data/middleManager/runtime.properties
               subPath: runtime.properties
+            - name: druid-middlemanager-volume
+              mountPath: /opt/druid/var/druid/
+            - name: druid-shared-volume
+              mountPath: /opt/shared
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -56,10 +59,15 @@ spec:
         - name: druid-common-runtime-properties
           configMap:
             name: druid-common-runtime-properties
-      volumes:
         - name: middlemanager-runtime-properties
           configMap:
             name: middlemanager-runtime-properties
+        - name: druid-middlemanager-volume
+          persistentVolumeClaim:
+            claimName: druid-middlemanager-volume
+        - name: druid-shared-volume
+          persistentVolumeClaim:
+            claimName: druid-shared-volume
 ---
 apiVersion: v1
 kind: Service
@@ -86,3 +94,32 @@ metadata:
 data:
   runtime.properties: |
       druid.host=druid-middlemanager.druid
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: druid-middlemanager-volume
+  labels:
+    run: druid-middlemanager
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/middlemanager"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-middlemanager-volume
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

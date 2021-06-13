@@ -43,10 +43,13 @@ spec:
             - name: druid-common-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/_common/common.runtime.properties
               subPath: common.runtime.properties
-          volumeMounts:
             - name: historical-runtime-properties
               mountPath: /opt/druid/conf/druid/cluster/data/historical/runtime.properties
               subPath: runtime.properties
+            - name: druid-historical-volume
+              mountPath: /opt/druid/var/druid/
+            - name: druid-shared-volume
+              mountPath: /opt/shared
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -56,10 +59,15 @@ spec:
         - name: druid-common-runtime-properties
           configMap:
             name: druid-common-runtime-properties
-      volumes:
         - name: historical-runtime-properties
           configMap:
             name: historical-runtime-properties
+        - name: druid-historical-volume
+          persistentVolumeClaim:
+            claimName: druid-historical-volume
+        - name: druid-shared-volume
+          persistentVolumeClaim:
+            claimName: druid-shared-volume
 ---
 apiVersion: v1
 kind: Service
@@ -106,3 +114,32 @@ data:
       druid.historical.cache.populateCache=true
       druid.cache.type=caffeine
       druid.cache.sizeInBytes=256MiB
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: druid-historical-volume
+  labels:
+    run: druid-historical
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/druid/data/historical"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-historical-volume
+  namespace: druid
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
