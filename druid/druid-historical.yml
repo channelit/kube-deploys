@@ -47,7 +47,7 @@ spec:
               mountPath: /opt/druid/conf/druid/cluster/data/historical/runtime.properties
               subPath: runtime.properties
             - name: druid-historical-volume
-              mountPath: /opt/druid/var/druid/
+              mountPath: /opt/druid/var
             - name: druid-shared-volume
               mountPath: /opt/shared
       dnsPolicy: ClusterFirst
@@ -129,7 +129,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/Users/hardikpatel/workbench/projects/kube-deploys/druid"
+    path: "/Users/hardikpatel/workbench/projects/kube-deploys/druid/data/historical"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

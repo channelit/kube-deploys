@@ -47,7 +47,7 @@ spec:
               mountPath: /opt/druid/conf/druid/cluster/master/coordinator-overlord/runtime.properties
               subPath: runtime.properties
             - name: druid-coordinator-volume
-              mountPath: /opt/druid/var/druid/
+              mountPath: /opt/druid/var
             - name: druid-shared-volume
               mountPath: /opt/shared
       dnsPolicy: ClusterFirst
@@ -123,7 +123,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/Users/hardikpatel/workbench/projects/kube-deploys/druid"
+    path: "/Users/hardikpatel/workbench/projects/kube-deploys/druid/data/coordinator"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

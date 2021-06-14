@@ -78,7 +78,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/Users/hardikpatel/workbench/projects/cit/kube-deploys/elasticsearch/data/kibana"
+    path: "/Users/hardikpatel/workbench/projects/kube-deploys/elastic/data/kibana"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
