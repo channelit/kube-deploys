@@ -23,7 +23,7 @@ spec:
       namespace: elastic
     spec:
       containers:
-        - image: docker.elastic.co/kibana/kibana:7.12.1
+        - image: docker.elastic.co/kibana/kibana:7.13.1
           imagePullPolicy: Always
           name: kibana
           resources: {}
@@ -36,18 +36,11 @@ spec:
             - name: publish
               containerPort: 5601
               protocol: TCP
-          # volumeMounts:
-          #   - name: kibana-data
-          #     mountPath: /usr/share/elasticsearch/data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      # volumes:
-      #   - name: kibana-data
-      #     persistentVolumeClaim:
-      #       claimName: kibana-data
 ---
 apiVersion: v1
 kind: Service
@@ -65,31 +58,3 @@ spec:
   selector:
     run: kibana
   type: LoadBalancer
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: kibana-data
-  namespace: elastic
-spec:
-  storageClassName: hostpath
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/Users/hardikpatel/workbench/projects/kube-deploys/elastic/data/kibana"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: kibana-data
-  namespace: elastic
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  volumeName: kibana-data
-  resources:
-    requests:
-      storage: 1Gi
