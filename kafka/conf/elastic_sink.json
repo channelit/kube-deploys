@@ -1,10 +1,14 @@
 {
   "name": "elastic-sink",
   "config": {
-   "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-   "connection.url": "http://elastic1.elastic.svc.cluster.local:9201,http://elastic2.elastic.svc.cluster.local:9202,http://elastic3.elastic.svc.cluster.local:9203",
-   "tasks.max": "1",
-   "topics": "cdc.public.employee",
-   "type.name": "_doc"
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "connection.url": "http://elastic1.elastic.svc.cluster.local:9201",
+    "tasks.max": "1",
+    "topics": "cdc.public.employee",
+    "type.name": "_doc",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    "schema.ignore": "true",
+    "key.ignore": "true"
   }
 }

@@ -128,7 +128,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/Users/hardikpatel/workbench/projects/kube-deploys/druid/data/broker"
+    path: "/private/tmp/kube-deploys/druid/data/broker"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

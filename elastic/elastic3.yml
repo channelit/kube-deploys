@@ -39,7 +39,7 @@ spec:
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
             - name: discovery.seed_hosts
-              value: "elastic1,elastic2,elastic3"
+              value: "elastic1,elastic2"
             - name: cluster.initial_master_nodes
               value: "elastic1,elastic2,elastic3"
           ports:
@@ -60,7 +60,7 @@ spec:
       volumes:
         - name: elastic3-data
           persistentVolumeClaim:
-            claimName: elastic3-data
+            claimName: elastic3-data-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -86,7 +86,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: elastic3-data
+  name: elastic3-data-pv
   namespace: elastic
 spec:
   storageClassName: hostpath
@@ -95,18 +95,17 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/Users/hardikpatel/workbench/projects/kube-deploys/elastic/data/elastic3"
+    path: "/private/tmp/kube-deploys/elastic/data/elastic3"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: elastic3-data
+  name: elastic3-data-pvc
   namespace: elastic
 spec:
+  storageClassName: hostpath
   accessModes:
     - ReadWriteOnce
-  volumeMode: Filesystem
-  volumeName: elastic3-data
   resources:
     requests:
       storage: 1Gi
