@@ -41,6 +41,6 @@ curl -X DELETE http://localhost:8082/connectors/cdc-rds
 
 ### Broker URL in Kubernetes
 ```
-localhost:29091,localhost:29092,localhost:29093
+kafka1.kafka.svc.cluster.local:39091,kafka2.kafka.svc.cluster.local:39092,kafka3.kafka.svc.cluster.local:39093
 
 ```
