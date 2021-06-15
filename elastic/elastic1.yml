@@ -39,9 +39,9 @@ spec:
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
             - name: discovery.seed_hosts
-              value: "elastic2,elastic3"
+              value: "elastic1"
             - name: cluster.initial_master_nodes
-              value: "elastic1,elastic2,elastic3"
+              value: "elastic1"
           ports:
             - name: publish
               containerPort: 9200
@@ -75,10 +75,6 @@ spec:
       port: 9201
       protocol: TCP
       targetPort: 9200
-    - name: inernal
-      port: 9301
-      protocol: TCP
-      targetPort: 9300
   selector:
     run: elastic1
   type: LoadBalancer

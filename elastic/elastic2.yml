@@ -75,10 +75,6 @@ spec:
       port: 9202
       protocol: TCP
       targetPort: 9200
-    - name: inernal
-      port: 9302
-      protocol: TCP
-      targetPort: 9300
   selector:
     run: elastic2
   type: LoadBalancer

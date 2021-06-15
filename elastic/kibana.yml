@@ -31,7 +31,9 @@ spec:
           terminationMessagePolicy: File
           env:
             - name: ELASTICSEARCH_HOSTS
-              value: '["http://elastic1:9200","http://elastic2:9200","http://elastic3:9200"]'
+              value: '["http://elastic1.elastic:9201"]'
+            - name: server.host
+              value: "0.0.0.0"
           ports:
             - name: publish
               containerPort: 5601
