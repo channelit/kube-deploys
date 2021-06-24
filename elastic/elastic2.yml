@@ -23,7 +23,7 @@ spec:
       namespace: elastic
     spec:
       containers:
-        - image: docker.elastic.co/elasticsearch/elasticsearch:7.13.1
+        - image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
           imagePullPolicy: Always
           name: elastic2
           resources: {}
@@ -33,15 +33,17 @@ spec:
             - name: cluster.name
               value: "elastic"
             - name: node.name
-              value: "elastic2"
+              value: elastic2
             - name: network.host
               value: "0.0.0.0"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
+            # - name: transport.port
+            #   value: "9300"
             - name: discovery.seed_hosts
-              value: "elastic1,elastic3"
+              value: "elastic1:9300"
             - name: cluster.initial_master_nodes
-              value: "elastic1,elastic2,elastic3"
+              value: "elastic1:9300"
           ports:
             - name: publish
               containerPort: 9200
