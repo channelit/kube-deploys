@@ -66,31 +66,31 @@ spec:
         - name: kafka1-volume
           configMap:
             name: kafka1-config
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   labels:
-#     run: kafka1
-#   name: kafka1
-#   namespace: kafka
-# spec:
-#   ports:
-#     - name: inernal
-#       port: 29091
-#       protocol: TCP
-#       targetPort: 29091
-#     - name: external
-#       port: 9091
-#       protocol: TCP
-#       targetPort: 9091
-#     - name: ui
-#       port: 39091
-#       protocol: TCP
-#       targetPort: 39091
-#   selector:
-#     run: kafka1
-#   type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: kafka1
+  name: kafka1
+  namespace: kafka
+spec:
+  ports:
+    - name: inernal
+      port: 29091
+      protocol: TCP
+      targetPort: 29091
+    - name: external
+      port: 9091
+      protocol: TCP
+      targetPort: 9091
+    - name: ui
+      port: 39091
+      protocol: TCP
+      targetPort: 39091
+  selector:
+    run: kafka1
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
