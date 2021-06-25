@@ -22,7 +22,8 @@ spec:
         run: kafdrop
     spec:
       containers:
-        - image: cithub/kafdrop
+        - image: obsidiandynamics/kafdrop
+        # - image: cithub/kafdrop
           imagePullPolicy: Always
           name: kafdrop
           resources: {}
