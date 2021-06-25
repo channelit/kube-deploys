@@ -30,8 +30,10 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           env:
+            # - name: ELASTICSEARCH_HOSTS
+            #   value: '["http://elastic1.elastic:9200","http://elastic2.elastic:9200","http://elastic3.elastic:9200"]'
             - name: ELASTICSEARCH_HOSTS
-              value: '["http://elastic1.elastic:9200","http://elastic2.elastic:9200","http://elastic3.elastic:9200"]'
+              value: '["http://elastic1.elastic:9200"]'
             - name: server.host
               value: "0.0.0.0"
           ports:
