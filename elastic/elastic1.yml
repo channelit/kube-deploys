@@ -77,10 +77,6 @@ spec:
       port: 9201
       protocol: TCP
       targetPort: 9200
-    - name: internal
-      port: 9300
-      protocol: TCP
-      targetPort: 9300
   selector:
     run: elastic1
   type: LoadBalancer
