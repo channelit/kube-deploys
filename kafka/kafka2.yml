@@ -66,31 +66,31 @@ spec:
         - name: kafka2-volume
           configMap:
             name: kafka2-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    run: kafka2
-  name: kafka2
-  namespace: kafka
-spec:
-  ports:
-    - name: internal
-      port: 29092
-      protocol: TCP
-      targetPort: 29092
-    - name: external
-      port: 9092
-      protocol: TCP
-      targetPort: 9092
-    - name: ui
-      port: 39092
-      protocol: TCP
-      targetPort: 39092
-  selector:
-    run: kafka2
-  type: LoadBalancer
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     run: kafka2
+#   name: kafka2
+#   namespace: kafka
+# spec:
+#   ports:
+#     - name: internal
+#       port: 29092
+#       protocol: TCP
+#       targetPort: 29092
+#     - name: external
+#       port: 9092
+#       protocol: TCP
+#       targetPort: 9092
+#     - name: ui
+#       port: 39092
+#       protocol: TCP
+#       targetPort: 39092
+#   selector:
+#     run: kafka2
+#   type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap

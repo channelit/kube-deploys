@@ -66,31 +66,31 @@ spec:
         - name: kafka3-volume
           configMap:
             name: kafka3-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    run: kafka3
-  name: kafka3
-  namespace: kafka
-spec:
-  ports:
-    - name: internal
-      port: 29093
-      protocol: TCP
-      targetPort: 29093
-    - name: external
-      port: 9093
-      protocol: TCP
-      targetPort: 9093
-    - name: ui
-      port: 39093
-      protocol: TCP
-      targetPort: 39093
-  selector:
-    run: kafka3
-  type: LoadBalancer
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     run: kafka3
+#   name: kafka3
+#   namespace: kafka
+# spec:
+#   ports:
+#     - name: internal
+#       port: 29093
+#       protocol: TCP
+#       targetPort: 29093
+#     - name: external
+#       port: 9093
+#       protocol: TCP
+#       targetPort: 9093
+#     - name: ui
+#       port: 39093
+#       protocol: TCP
+#       targetPort: 39093
+#   selector:
+#     run: kafka3
+#   type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
