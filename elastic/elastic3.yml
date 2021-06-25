@@ -31,19 +31,19 @@ spec:
           terminationMessagePolicy: File
           env:
             - name: cluster.name
-              value: "elastic"
+              value: elastic
             - name: node.name
-              value: "elastic3"
+              value: elastic3
             - name: network.host
               value: "0.0.0.0"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
-            # - name: transport.port
-            #   value: "9300"
+            - name: transport.port
+              value: "9300"
             - name: discovery.seed_hosts
-              value: "elastic1:9300"
+              value: "elastic1.elastic:9300"
             - name: cluster.initial_master_nodes
-              value: "elastic1:9300"
+              value: "elastic1.elastic:9300"
           ports:
             - name: publish
               containerPort: 9200
@@ -74,12 +74,16 @@ metadata:
 spec:
   ports:
     - name: external
-      port: 9203
+      port: 9200
       protocol: TCP
       targetPort: 9200
+    - name: internal
+      port: 9300
+      protocol: TCP
+      targetPort: 9300
   selector:
     run: elastic3
-  type: LoadBalancer
+  type: ClusterIP
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
