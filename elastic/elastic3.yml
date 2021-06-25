@@ -51,18 +51,18 @@ spec:
             - name: node
               containerPort: 9300
               protocol: TCP
-          volumeMounts:
-            - name: elastic3-data
-              mountPath: /usr/share/elasticsearch/data
+          # volumeMounts:
+          #   - name: elastic3-data
+          #     mountPath: /usr/share/elasticsearch/data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      volumes:
-        - name: elastic3-data
-          persistentVolumeClaim:
-            claimName: elastic3-data-pvc
+      # volumes:
+      #   - name: elastic3-data
+      #     persistentVolumeClaim:
+      #       claimName: elastic3-data-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -80,30 +80,30 @@ spec:
   selector:
     run: elastic3
   type: LoadBalancer
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: elastic3-data-pv
-  namespace: elastic
-spec:
-  storageClassName: standard
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/private/tmp/kube-deploys/elastic/data/elastic3"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: elastic3-data-pvc
-  namespace: elastic
-spec:
-  storageClassName: standard
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: elastic3-data-pv
+#   namespace: elastic
+# spec:
+#   storageClassName: standard
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: "/private/tmp/kube-deploys/elastic/data/elastic3"
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: elastic3-data-pvc
+#   namespace: elastic
+# spec:
+#   storageClassName: standard
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
