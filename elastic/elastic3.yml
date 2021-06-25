@@ -38,8 +38,8 @@ spec:
               value: "0.0.0.0"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
-            - name: transport.port
-              value: "9300"
+            # - name: node.roles
+            #   value: "data, data_content, data_hot, data_warm, data_cold, data_frozen, ingest, ml, remote_cluster_client, transform"
             - name: discovery.seed_hosts
               value: "elastic1:9300"
             - name: cluster.initial_master_nodes
