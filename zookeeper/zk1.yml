@@ -56,34 +56,34 @@ spec:
       #   - name: zoo1-volume
       #     persistentVolumeClaim:
       #       claimName: zoo1
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    run: zoo1
-  name: zoo1
-  namespace: zookeeper
-spec:
-  ports:
-    - name: client
-      port: 2181
-      protocol: TCP
-      targetPort: 2181
-    - name: server
-      port: 2888
-      protocol: TCP
-      targetPort: 2888
-    - name: leader-election
-      port: 3888
-      protocol: TCP
-      targetPort: 3888
-  selector:
-    run: zoo1
-  sessionAffinity: None
-  type: LoadBalancer
-status:
-  loadBalancer: {}
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   labels:
+#     run: zoo1
+#   name: zoo1
+#   namespace: zookeeper
+# spec:
+#   ports:
+#     - name: client
+#       port: 2181
+#       protocol: TCP
+#       targetPort: 2181
+#     - name: server
+#       port: 2888
+#       protocol: TCP
+#       targetPort: 2888
+#     - name: leader-election
+#       port: 3888
+#       protocol: TCP
+#       targetPort: 3888
+#   selector:
+#     run: zoo1
+#   sessionAffinity: None
+#   type: LoadBalancer
+# status:
+#   loadBalancer: {}
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
