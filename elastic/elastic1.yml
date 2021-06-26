@@ -59,6 +59,10 @@ spec:
             limits:
               memory: "2048Mi"
               cpu: "2"
+      initContainers:
+        - name: init-elastic1
+          image: busybox:1.28
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
