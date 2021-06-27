@@ -100,7 +100,7 @@ metadata:
   name: elastic1-data-pv
   namespace: elastic
 spec:
-  storageClassName: host
+  storageClassName: hostpath
   capacity:
     storage: 1Gi
   accessModes:
@@ -114,7 +114,7 @@ metadata:
   name: elastic1-data-pvc
   namespace: elastic
 spec:
-  storageClassName: host
+  storageClassName: hostpath
   accessModes:
     - ReadWriteOnce
   resources:
