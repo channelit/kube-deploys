@@ -70,7 +70,6 @@ spec:
             privileged: true
             runAsUser: 1000
             runAsGroup: 3000
-            fsGroup: 2000
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
