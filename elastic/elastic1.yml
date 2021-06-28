@@ -41,7 +41,7 @@ spec:
           securityContext:
             privileged: true
             runAsUser: 0
-            runAsNonRoot: False
+            runAsNonRoot: true
       containers:
         - image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
           imagePullPolicy: Always
