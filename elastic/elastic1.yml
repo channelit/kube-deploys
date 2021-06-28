@@ -22,7 +22,7 @@ spec:
         run: elastic1
       namespace: elastic
     spec:
-       initContainers:
+      initContainers:
         - name: set-vm-max-map-count
           image: busybox
           imagePullPolicy: IfNotPresent
