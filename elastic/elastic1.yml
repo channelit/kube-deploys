@@ -55,10 +55,10 @@ spec:
           resources:
             requests:
               memory: "2048Mi"
-              cpu: "2"
+              cpu: "4"
             limits:
               memory: "2048Mi"
-              cpu: "2"
+              cpu: "4"
       initContainers:
         - name: init-elastic1
           image: busybox:1.28
