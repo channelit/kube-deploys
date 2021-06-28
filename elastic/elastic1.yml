@@ -52,13 +52,6 @@ spec:
           volumeMounts:
             - name: elastic1-data
               mountPath: /usr/share/elasticsearch/data
-          resources:
-            requests:
-              memory: "2048Mi"
-              cpu: "4"
-            limits:
-              memory: "2048Mi"
-              cpu: "4"
       initContainers:
         - name: init-elastic1
           image: busybox:1.28
