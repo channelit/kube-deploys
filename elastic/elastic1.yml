@@ -66,6 +66,8 @@ spec:
           volumeMounts:
             - name: elastic1-data
               mountPath: /usr/share/elasticsearch/data
+          securityContext:
+            privileged: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -109,8 +111,8 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    # path: "/private/tmp/kube-deploys/elastic/data/elastic1"
-    path: "/var/lib/data/elastic1"
+    path: "/private/tmp/kube-deploys/elastic/data/elastic1"
+    # path: "/var/lib/data/elastic1"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
