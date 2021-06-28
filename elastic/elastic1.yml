@@ -40,8 +40,10 @@ spec:
               value: "-Xms512m -Xmx512m"
             - name: transport.port
               value: "9300"
-            - name: cluster.initial_master_nodes
-              value: "127.0.0.1:9300"
+            # - name: cluster.initial_master_nodes
+            #   value: "elastic1:9300"
+            - name: discovery.type
+              value: "single-node"
           ports:
             - name: publish
               containerPort: 9200
@@ -52,10 +54,6 @@ spec:
           volumeMounts:
             - name: elastic1-data
               mountPath: /usr/share/elasticsearch/data
-      initContainers:
-        - name: init-elastic1
-          image: busybox:1.28
-          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -76,7 +74,7 @@ metadata:
 spec:
   ports:
     - name: external
-      port: 9201
+      port: 9200
       protocol: TCP
       targetPort: 9200
     - name: internal
