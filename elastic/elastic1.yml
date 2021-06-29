@@ -63,9 +63,9 @@ spec:
             - name: node
               containerPort: 9300
               protocol: TCP
-          # volumeMounts:
-          #   - name: elastic1-data
-          #     mountPath: /usr/share/elasticsearch/data
+          volumeMounts:
+            - name: elastic1-data
+              mountPath: /usr/share/elasticsearch/data
           securityContext:
             privileged: true
             runAsUser: 1000
@@ -75,10 +75,10 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      # volumes:
-      #   - name: elastic1-data
-      #     persistentVolumeClaim:
-      #       claimName: elastic1-data-pvc
+      volumes:
+        - name: elastic1-data
+          persistentVolumeClaim:
+            claimName: elastic1-data-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -107,7 +107,7 @@ metadata:
   name: elastic1-data-pv
   namespace: elastic
 spec:
-  storageClassName: standard
+  storageClassName: hostpath
   capacity:
     storage: 5Gi
   accessModes:
@@ -122,7 +122,7 @@ metadata:
   name: elastic1-data-pvc
   namespace: elastic
 spec:
-  storageClassName: standard
+  storageClassName: hostpath
   accessModes:
     - ReadWriteOnce
   resources:
