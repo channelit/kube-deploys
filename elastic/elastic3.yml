@@ -76,13 +76,6 @@ spec:
           volumeMounts:
             - name: elastic3-data
               mountPath: /usr/share/elasticsearch/data
-          resources:
-            requests:
-              memory: "2048Mi"
-              cpu: "2"
-            limits:
-              memory: "2048Mi"
-              cpu: "2"
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
