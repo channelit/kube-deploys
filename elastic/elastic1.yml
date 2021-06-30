@@ -38,7 +38,7 @@ spec:
           image: busybox
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh"] 
-          args: ["-c", "sudo chown -R 1000:1000 /usr/share/elasticsearch/data"] 
+          args: ["-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"] 
           volumeMounts:
             - name: elastic1-data
               mountPath: /usr/share/elasticsearch/data
