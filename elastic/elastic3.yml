@@ -63,7 +63,7 @@ spec:
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
             - name: discovery.seed_hosts
-              value: "elastic1:9300,elastic129300,elastic3:9300"
+              value: "elastic1:9300,elastic2:9300,elastic3:9300"
             - name: cluster.initial_master_nodes
               value: "elastic1:9300,elastic2:9300,elastic3:9300"
           ports:
