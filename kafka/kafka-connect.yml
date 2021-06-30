@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - image: cithub/kafka
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           name: kafka-connect
           command: ["./opt/kafka/bin/connect-distributed.sh", "/conf/worker.properties"]
           resources: {}
