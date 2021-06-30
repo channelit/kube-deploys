@@ -30,13 +30,13 @@ zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3
 
 ### Kafka Connect for Postgres
 ```
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --data @conf/cdc_postgres.json http://localhost:8082/connectors/
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --data @conf/cdc_postgres.credentials http://34.139.102.126:8082/connectors/
 
 ```
 
 ### Kafka Connect Sink for Elatic
 ```
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" -d @conf/elastic_sink.json http://localhost:8082/connectors/
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" -d @conf/elastic_sink.json http://34.139.102.126:8082/connectors/
 ```
 
 #### Delete Connector
