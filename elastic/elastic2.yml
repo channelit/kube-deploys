@@ -111,7 +111,7 @@ spec:
       targetPort: 9300
   selector:
     run: elastic2
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
