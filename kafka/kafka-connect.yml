@@ -76,7 +76,7 @@ metadata:
 data:
   worker.properties: |
       group.id=workers
-      bootstrap.servers=kafka1:39091,kafka2:39092,kafka3:39093
+      bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
       key.converter=org.apache.kafka.connect.json.JsonConverter
       value.converter=org.apache.kafka.connect.json.JsonConverter
       plugin.path=/connectors

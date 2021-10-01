@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: member
+  name: member
+  namespace: members
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: member
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: member
+      labels:
+        run: member
+      namespace: members
+    spec:
+      initContainers:
+        - name: set-vm-max-map-count
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command:
+          - sysctl
+          - -w
+          - vm.max_map_count=262166
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsNonRoot: False
+        - name: chown
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"] 
+          args: ["-c", "chown -R 1000:1000 /var/hyperledger/production"] 
+          volumeMounts:
+            - name: member-data
+              mountPath: /var/hyperledger/production
+      containers:
+        - image: hyperledger/fabric-member:amd64-2.0.0
+          imagePullPolicy: Always
+          name: member
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: CORE_member_ADDRESSAUTODETECT
+              value: "true"
+            - name: CORE_LOGGING_LEVEL
+              value: "debug"
+          ports:
+            - name: publish
+              containerPort: 5000
+              protocol: TCP
+            - name: internal
+              containerPort: 30303
+              protocol: TCP
+            - name: member
+              containerPort: 30304
+              protocol: TCP
+          args: ["member", "node", "start"]
+          volumeMounts:
+            - name: member-data
+              mountPath: /var/hyperledger/production
+          securityContext:
+            privileged: true
+            runAsUser: 1000
+            runAsGroup: 0
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: member-data
+          persistentVolumeClaim:
+            claimName: member-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: member
+  name: member
+  namespace: members
+spec:
+  ports:
+    - name: publish
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    - name: internal
+      port: 30303
+      protocol: TCP
+      targetPort: 30303
+    - name: member
+      port: 30304
+      protocol: TCP
+      targetPort: 30304
+  selector:
+    run: member
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: member-data-pvc
+  namespace: members
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

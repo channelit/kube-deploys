@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: vp1
-  name: vp1
+    run: vp0
+  name: vp0
   namespace: peers
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: vp1
+      run: vp0
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -17,9 +17,9 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: vp1
+      name: vp0
       labels:
-        run: vp1
+        run: vp0
       namespace: peers
     spec:
       initContainers:
@@ -40,12 +40,12 @@ spec:
           command: ["/bin/sh"] 
           args: ["-c", "chown -R 1000:1000 /var/hyperledger/production"] 
           volumeMounts:
-            - name: vp1-data
+            - name: vp0-data
               mountPath: /var/hyperledger/production
       containers:
         - image: hyperledger/fabric-peer:amd64-2.0.0
           imagePullPolicy: Always
-          name: vp1
+          name: vp0
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
@@ -66,7 +66,7 @@ spec:
               protocol: TCP
           args: ["peer", "node", "start"]
           volumeMounts:
-            - name: vp1-data
+            - name: vp0-data
               mountPath: /var/hyperledger/production
           securityContext:
             privileged: true
@@ -78,16 +78,16 @@ spec:
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: vp1-data
+        - name: vp0-data
           persistentVolumeClaim:
-            claimName: vp1-data-pvc
+            claimName: vp0-data-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    run: vp1
-  name: vp1
+    run: vp0
+  name: vp0
   namespace: peers
 spec:
   ports:
@@ -104,13 +104,13 @@ spec:
       protocol: TCP
       targetPort: 30304
   selector:
-    run: vp1
-  type: LoadBalancer
+    run: vp0
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: vp1-data-pvc
+  name: vp0-data-pvc
   namespace: peers
 spec:
   accessModes:

@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: vp1
+  name: vp1
+  namespace: peers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: vp1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: vp1
+      labels:
+        run: vp1
+      namespace: peers
+    spec:
+      initContainers:
+        - name: set-vm-max-map-count
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command:
+          - sysctl
+          - -w
+          - vm.max_map_count=262166
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsNonRoot: False
+        - name: chown
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"] 
+          args: ["-c", "chown -R 1000:1000 /var/hyperledger/production"] 
+          volumeMounts:
+            - name: vp1-data
+              mountPath: /var/hyperledger/production
+      containers:
+        - image: hyperledger/fabric-peer:amd64-2.0.0
+          imagePullPolicy: Always
+          name: vp1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: CORE_PEER_DISCOVERY_ROOTNODE
+              value: "vp0:30303"
+            - name: CORE_PEER_ID
+              value: "vp1"
+          ports:
+            - name: publish
+              containerPort: 5000
+              protocol: TCP
+            - name: internal
+              containerPort: 30303
+              protocol: TCP
+            - name: peer
+              containerPort: 30304
+              protocol: TCP
+          args: ["peer", "node", "start"]
+          volumeMounts:
+            - name: vp1-data
+              mountPath: /var/hyperledger/production
+          securityContext:
+            privileged: true
+            runAsUser: 1000
+            runAsGroup: 0
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: vp1-data
+          persistentVolumeClaim:
+            claimName: vp1-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: vp1
+  name: vp1
+  namespace: peers
+spec:
+  ports:
+    - name: publish
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    - name: internal
+      port: 30303
+      protocol: TCP
+      targetPort: 30303
+    - name: peer
+      port: 30304
+      protocol: TCP
+      targetPort: 30304
+  selector:
+    run: vp1
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vp1-data-pvc
+  namespace: peers
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
