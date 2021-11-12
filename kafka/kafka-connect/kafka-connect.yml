@@ -80,7 +80,7 @@ data:
       key.converter=org.apache.kafka.connect.json.JsonConverter
       value.converter=org.apache.kafka.connect.json.JsonConverter
       plugin.path=/connectors
-      rest.port=8082
+      listeners=http://0.0.0.0:8082
       config.storage.topic=worker-config
       offset.storage.topic=worker-offset
       status.storage.topic=worker-status
