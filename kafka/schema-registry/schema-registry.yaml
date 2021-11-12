@@ -82,7 +82,7 @@ spec:
       targetPort: 8081
   selector:
     run: schema-registry
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
