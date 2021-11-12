@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: schema-registry
+  name: schema-registry
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: schema-registry
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: schema-registry
+      labels:
+        run: schema-registry
+    spec:
+      containers:
+        - image: ghcr.io/channelit/kafka-confluent-community:latest
+          imagePullPolicy: Always
+          name: schema-registry
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: KAFKA_BROKER_CONNECT
+              value: kafka1:29091,kafka2:29092,kafka3:29093
+          command: ["/bin/sh"]
+          args: ["-c", "/opt/kafka/bin/schema-registry-start /conf/schema-registry.properties"]
+          ports:
+            - name: schema-registry
+              containerPort: 8081
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: 8081
+              scheme: "HTTP"
+              path: "/"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              port: 8081
+              scheme: "HTTP"
+              path: "/"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          volumeMounts:
+            - name: schema-registry-properties
+              mountPath: /conf/schema-registry.properties
+              subPath: schema-registry.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: schema-registry-properties
+        configMap:
+          name: schema-registry-properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: schema-registry
+  name: schema-registry
+  namespace: kafka
+spec:
+  ports:
+    - name: inernal
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    run: schema-registry
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schema-registry-properties
+  namespace: kafka
+data:
+  schema-registry.properties: |
+      listeners=http://0.0.0.0:8081
+      kafkastore.bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
+      kafkastore.connection.url=zoo1:2181,zoo2:2181,zoo3:2181
+      kafkastore.topic=_schemas
+      debug=true
