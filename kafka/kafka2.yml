@@ -22,9 +22,11 @@ spec:
         run: kafka2
     spec:
       containers:
-        - image: cithub/kafka
+        - image: ghcr.io/channelit/kafka:latest
           imagePullPolicy: Always
           name: kafka2
+          command: ["/bin/sh"]
+          args: ["-c", "/opt/kafka/bin/kafka-server-start.sh /conf/server.properties"]
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
