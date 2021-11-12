@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: ksqldb-server
+  name: ksqldb-server
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ksqldb-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: ksqldb-server
+      labels:
+        run: ksqldb-server
+    spec:
+      containers:
+        - image: ghcr.io/channelit/ksql:latest
+          imagePullPolicy: Always
+          name: ksqldb-server
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: KSQL_LISTENERS
+              value: http://0.0.0.0:8088
+            - name: KSQL_BOOTSTRAP_SERVERS
+              value: kafka1:29091,kafka2:29092,kafka3:29093
+            - name: KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE
+              value: "true"
+            - name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE
+              value: "true"
+          command: ["/bin/sh"]
+          args: ["-c", "/opt/ksql/bin/ksql-server-start /conf/ksql-server.properties"]
+          ports:
+            - name: ksqldb-server
+              containerPort: 8088
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: 8088
+              scheme: "HTTP"
+              path: "/"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              port: 8088
+              scheme: "HTTP"
+              path: "/"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          volumeMounts:
+            - name: ksql-server-properties
+              mountPath: /conf/ksql-server.properties
+              subPath: ksql-server.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: ksql-server-properties
+        configMap:
+          name: ksql-server-properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: ksqldb-server
+  name: ksqldb-server
+  namespace: kafka
+spec:
+  ports:
+    - name: inernal
+      port: 8088
+      protocol: TCP
+      targetPort: 8088
+  selector:
+    run: ksqldb-server
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ksql-server-properties
+  namespace: kafka
+data:
+  ksql-server.properties: |
+      bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
+      group.id=ksql-connect-cluster
+      key.converter=org.apache.kafka.connect.storage.StringConverter
+      key.converter.schema.registry.url=http://schema-registry:8081
+      value.converter=io.confluent.connect.avro.AvroConverter
+      value.converter.schema.registry.url=http://schema-registry:8081
+      config.storage.topic=ksql-connect-configs
+      offset.storage.topic=ksql-connect-offsets
+      status.storage.topic=ksql-connect-statuses
+      config.storage.replication.factor=1
+      offset.storage.replication.factor=1
+      status.storage.replication.factor=1
+      internal.key.converter=org.apache.kafka.connect.json.JsonConverter
+      internal.value.converter=org.apache.kafka.connect.json.JsonConverter
+      internal.key.converter.schemas.enable=false
