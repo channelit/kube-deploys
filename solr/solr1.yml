@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: solr1
+  name: solr1
+  namespace: solr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: solr1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: solr1
+      labels:
+        run: solr1
+    spec:
+      containers:
+        - image: ghcr.io/channelit/solr:latest
+          imagePullPolicy: Always
+          name: solr1
+          command: ["/bin/sh"]
+          args: ["-c", "/var/solr/conf/solr-entrypoint.sh"]
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: ZK_HOST
+              value: "zoo1.zookeeper:2181,zoo2.zookeeper:2181,zoo3.zookeeper:2181"
+            - name: SOLR_HOST
+              value: solr1.solr.svc.cluster.local
+          ports:
+            - name: server
+              containerPort: 8983
+          volumeMounts:
+            - name: solr-configmap
+              mountPath: /var/solr/conf
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: solr-configmap
+          configMap:
+            name: solr-configmap
+            items:
+            - key: "solr-entrypoint.sh"
+              path: "solr-entrypoint.sh"
+              mode: 0777
+            - key: "solr.xml"
+              path: "solr.xml"
+            - key: "solr-security.sh"
+              path: "solr-security.sh"
+            - key: "setup-certs.sh"
+              path: "setup-certs.sh"
+            - key: "setup-jks.sh"
+              path: "setup-jks.sh"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: solr1
+  name: solr1
+  namespace: solr
+spec:
+  ports:
+    - name: external
+      port: 8983
+      protocol: TCP
+      targetPort: 8983
+  selector:
+    run: solr1
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solr-configmap
+  namespace: solr
+data:
+  solr-entrypoint.sh: |
+      ls /var/solr/conf
+      /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost $ZK_HOST -cmd makepath /solr
+      /opt/solr/bin/solr zk upconfig -n cit_default -d /opt/solr/server/solr/configsets/_default -z $ZK_HOST/solr -r
+      /opt/solr/bin/solr zk cp file:/var/solr/conf/solr.xml zk:/solr/solr.xml -z $ZK_HOST
+      /opt/solr/bin/solr start -f -c -p 8983 -z $ZK_HOST/solr
+  solr.xml: |
+      <?xml version="1.0" encoding="UTF-8" ?>
+      <solr>
+          <solrcloud>
+              <str name="host">${host:}</str>
+              <int name="hostPort">${jetty.port:8983}</int>
+              <str name="hostContext">${hostContext:solr}</str>
+              <bool name="genericCoreNodeNames">${genericCoreNodeNames:true}</bool>
+              <int name="zkClientTimeout">${zkClientTimeout:30000}</int>
+              <int name="distribUpdateSoTimeout">${distribUpdateSoTimeout:600000}</int>
+              <int name="distribUpdateConnTimeout">${distribUpdateConnTimeout:60000}</int>
+              <str name="zkCredentialsProvider">${zkCredentialsProvider:org.apache.solr.common.cloud.DefaultZkCredentialsProvider}</str>
+              <str name="zkACLProvider">${zkACLProvider:org.apache.solr.common.cloud.DefaultZkACLProvider}</str>
+          </solrcloud>
+          <shardHandlerFactory name="shardHandlerFactory" class="HttpShardHandlerFactory">
+              <int name="socketTimeout">${socketTimeout:600000}</int>
+              <int name="connTimeout">${connTimeout:60000}</int>
+          </shardHandlerFactory>
+      </solr>
+  solr-security.sh: |
+      #!/bin/bash
+      if [[ ! -z "$SOLR_INIT" ]]; then
+          echo "Setting up ZK"
+          echo "ZK_HOST is " $ZK_HOST
+          echo "SOLR_CONF is " $SOLR_CONF
+          ./server/scripts/cloud-scripts/zkcli.sh -zkhost $ZK_HOST -cmd makepath /solr
+          ./bin/solr zk upconfig -n cit_default -d "$SOLR_CONF"/_default -z "$ZK_HOST"/solr -r
+          ./bin/solr zk cp file:"$SOLR_CONF"/solr.xml zk:/solr/solr.xml -z "$ZK_HOST"
+      fi
+      if [[ ! -z "$SOLR_SSL" ]]; then
+        if [ ! -f /certs/solr-ssl.keystore.jks ]; then
+          echo "Setting up SSL"
+          ./server/scripts/cloud-scripts/zkcli.sh -zkhost "$ZK_HOST"/solr -cmd clusterprop -name urlScheme -val https
+          ./setup-certs.sh
+        fi
+        echo "Setting Solr SSL Environment"
+        export SOLR_SSL_KEY_STORE="/certs/solr-ssl.keystore.jks"
+        export SOLR_SSL_KEY_STORE_PASSWORD="secret"
+        export SOLR_SSL_TRUST_STORE="/certs/solr-ssl.keystore.jks"
+        export SOLR_SSL_TRUST_STORE_PASSWORD="secret"
+        export SOLR_SSL_NEED_CLIENT_AUTH="false"
+        export SOLR_SSL_WANT_CLIENT_AUTH="false"
+        export SOLR_SSL_CHECK_PEER_NAME="false"
+        export SOLR_SSL_KEY_STORE_TYPE="JKS"
+        export SOLR_SSL_TRUST_STORE_TYPE="JKS"
+      fi
+      exec "$@"
+  setup-certs.sh: |
+      #!/bin/sh
+      keytool -genkeypair -alias solr-ssl -keyalg RSA -keysize 2048 -keypass secret -storepass secret -validity 9999 -keystore /certs/solr-ssl.keystore.jks -ext SAN=DNS:localhost,DNS:solr1,DNS:solr2,DNS:solr3,IP:192.168.1.3,IP:127.0.0.1 -dname "CN=$SOLR_HOST, OU=CITS, O=CITS, L=DC, ST=VA, C=USA"
+      keytool -importkeystore -srckeystore /certs/solr-ssl.keystore.jks -srcstorepass secret -destkeystore /certs/solr-ssl.keystore.p12 -srcstoretype jks -deststoretype pkcs12 -deststorepass secret -noprompt
+  setup-jks.sh: |
+      #!/bin/bash
+      #openssl rsa -in <(openssl s_client -connect solr1:443 -prexit 2>/dev/null) -out /certs/solr1.crt
+      #openssl rsa -in <(openssl s_client -connect solr2:443 -prexit 2>/dev/null) -out /certs/solr2.crt
+      #openssl rsa -in <(openssl s_client -connect solr3:443 -prexit 2>/dev/null) -out /certs/solr3.crt
+      openssl s_client -connect solr1:8983 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /certs/solr1.crt
+      openssl s_client -connect solr2:8983 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /certs/solr2.crt
+      openssl s_client -connect solr3:8983 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /certs/solr3.crt
+      keytool -import -alias solr1 -file /certs/solr1.crt -keystore /certs/solr-ssl.keystore.jks -storepass secret -noprompt
+      keytool -import -alias solr2 -file /certs/solr2.crt -keystore /certs/solr-ssl.keystore.jks -storepass secret -noprompt
+      keytool -import -alias solr3 -file /certs/solr3.crt -keystore /certs/solr-ssl.keystore.jks -storepass secret -noprompt
+

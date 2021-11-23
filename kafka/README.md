@@ -41,7 +41,7 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
 
 #### Delete Connector
 ```
-curl -X DELETE http://localhost:8082/connectors/cdc-rds
+curl -X DELETE http://localhost:8082/connectors/cdc-local
 
 ```
 
