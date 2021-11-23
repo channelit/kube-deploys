@@ -1,8 +1,14 @@
-# Solr security with JWT
-### Using KeyCloak deployed on Kubernetes
-#### __Without using HELL of Helm !!__
+# Solr Kubernetes deployment examples
 
-1. Create ConfigMap
-```shell script
+### Start Zookeeper cluster (from ../zookeeper)
+```
+kubectl create namespace zookeeper
+kubectl apply -f ./ -n zookeeper
+```
 
+### Start Solr Cluster
+```
+kubectl create namespace solr
+kubectl apply -f solr1.yml -n solr
+kubectl apply -f ./ -n solr
 ```

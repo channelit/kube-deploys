@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: solr2
+  name: solr2
+  namespace: solr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: solr2
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: solr2
+      labels:
+        run: solr2
+    spec:
+      containers:
+        - image: ghcr.io/channelit/solr:latest
+          imagePullPolicy: Always
+          name: solr2
+          command: ["/bin/sh"]
+          args: ["-c", "/var/solr/conf/solr-entrypoint.sh"]
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: ZK_HOST
+              value: "zoo1.zookeeper:2181,zoo2.zookeeper:2181,zoo3.zookeeper:2181"
+            - name: SOLR_HOST
+              value: solr2.solr.svc.cluster.local
+          ports:
+            - name: server
+              containerPort: 8983
+          volumeMounts:
+            - name: solr2-configmap
+              mountPath: /var/solr/conf
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: solr2-configmap
+          configMap:
+            name: solr2-configmap
+            items:
+            - key: "solr-entrypoint.sh"
+              path: "solr-entrypoint.sh"
+              mode: 0777
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: solr2
+  name: solr2
+  namespace: solr
+spec:
+  ports:
+    - name: external
+      port: 8983
+      protocol: TCP
+      targetPort: 8983
+  selector:
+    run: solr2
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solr2-configmap
+  namespace: solr
+data:
+  solr-entrypoint.sh: |
+      /opt/solr/bin/solr start -f -c -p 8983 -z $ZK_HOST/solr

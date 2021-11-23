@@ -39,7 +39,7 @@ spec:
             - name: server
               containerPort: 8983
           volumeMounts:
-            - name: solr-configmap
+            - name: solr1-configmap
               mountPath: /var/solr/conf
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -47,9 +47,9 @@ spec:
       securityContext: {}
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: solr-configmap
+        - name: solr1-configmap
           configMap:
-            name: solr-configmap
+            name: solr1-configmap
             items:
             - key: "solr-entrypoint.sh"
               path: "solr-entrypoint.sh"
@@ -83,7 +83,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: solr-configmap
+  name: solr1-configmap
   namespace: solr
 data:
   solr-entrypoint.sh: |
