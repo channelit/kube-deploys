@@ -36,7 +36,7 @@ spec:
             - name: SOLR_HOST
               value: solr3.solr
             - name: SOLR_PORT
-              value: 8983
+              value: "8983"
           ports:
             - name: server
               containerPort: 8983
