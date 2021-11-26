@@ -29,6 +29,10 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "/conf/start-worker.sh"]
           env:
             - name: CLASSPATH
               value: /connectors/*
@@ -38,8 +42,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: kafka-connect-volume
-              mountPath: /conf/worker.properties
-              subPath: worker.properties
+              mountPath: /conf
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -49,6 +52,16 @@ spec:
         - name: kafka-connect-volume
           configMap:
             name: kafka-connect-config
+            items:
+            - key: "worker.properties"
+              path: "worker.properties"
+            - key: "start-worker.sh"
+              path: "start-worker.sh"
+              mode: 0755
+            - key: "source_postgres.json"
+              path: "source_postgres.json"
+            - key: "sink_elastic.json"
+              path: "sink_elastic.json"
 ---
 apiVersion: v1
 kind: Service
@@ -85,3 +98,35 @@ data:
       offset.storage.topic=worker-offset
       status.storage.topic=worker-status
       heartbeat.interval.ms=5000
+  start-worker.sh: |
+      sleep 2m
+      curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --data @conf/source_postgres.json http://localhost:8082/connectors/
+  source_postgres.json: |
+      {
+        "name": "cdc-local",
+        "config": {
+         "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+         "database.hostname": "postgres.postgres",
+         "database.port": "5432",
+         "database.user": "cits",
+         "database.password": "admin",
+         "database.dbname": "postgres",
+         "database.server.name": "cdc",
+         "plugin.name": "wal2json"
+        }
+      }
+  sink_elastic.json: |
+      {
+        "name": "elastic-sink",
+        "config": {
+          "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+          "connection.url": "http://elastic1.elastic.svc.cluster.local:9200",
+          "tasks.max": "1",
+          "topics": "cdc.public.employee",
+          "type.name": "_doc",
+          "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+          "value.converter.schemas.enable": "false",
+          "schema.ignore": "true",
+          "key.ignore": "true"
+        }
+      }
