@@ -22,7 +22,7 @@ spec:
         run: zoo1
     spec:
       containers:
-        - image: cithub/zookeeper
+        - image: ghcr.io/channelit/zookeeper:latest
           imagePullPolicy: Always
           name: zoo1
           resources: {}

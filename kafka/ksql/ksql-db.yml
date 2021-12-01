@@ -37,6 +37,10 @@ spec:
               value: "true"
             - name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE
               value: "true"
+            - name: KSQL_KSQL_SCHEMA_REGISTRY_URL
+              value: http://schema-registry:8081
+            - name: KSQL_KSQL_QUERY_PULL_TABLE_SCAN_ENABLED
+              value: "true"
           command: ["/bin/sh"]
           args: ["-c", "/opt/ksql/bin/ksql-server-start /conf/ksql-server.properties"]
           ports:
@@ -99,10 +103,12 @@ data:
   ksql-server.properties: |
       bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
       group.id=ksql-connect-cluster
-      key.converter=org.apache.kafka.connect.storage.StringConverter
+      ksql.query.pull.table.scan.enabled=true
+      auto.offset.reset=earliest
+      key.converter=io.confluent.connect.json.JsonSchemaConverter
       ksql.schema.registry.url=http://schema-registry:8081
       key.converter.schema.registry.url=http://schema-registry:8081
-      value.converter=io.confluent.connect.avro.AvroConverter
+      value.converter=io.confluent.connect.json.JsonSchemaConverter
       value.converter.schema.registry.url=http://schema-registry:8081
       config.storage.topic=ksql-connect-configs
       offset.storage.topic=ksql-connect-offsets
