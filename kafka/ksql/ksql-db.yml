@@ -105,11 +105,7 @@ data:
       group.id=ksql-connect-cluster
       ksql.query.pull.table.scan.enabled=true
       auto.offset.reset=earliest
-      key.converter=io.confluent.connect.json.JsonSchemaConverter
       ksql.schema.registry.url=http://schema-registry:8081
-      key.converter.schema.registry.url=http://schema-registry:8081
-      value.converter=io.confluent.connect.json.JsonSchemaConverter
-      value.converter.schema.registry.url=http://schema-registry:8081
       config.storage.topic=ksql-connect-configs
       offset.storage.topic=ksql-connect-offsets
       status.storage.topic=ksql-connect-statuses

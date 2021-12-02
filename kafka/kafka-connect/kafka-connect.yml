@@ -90,8 +90,10 @@ data:
   worker.properties: |
       group.id=workers
       bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
-      key.converter=org.apache.kafka.connect.json.JsonConverter
-      value.converter=org.apache.kafka.connect.json.JsonConverter
+      key.converter=io.confluent.connect.json.JsonSchemaConverter
+      value.converter=io.confluent.connect.json.JsonSchemaConverter
+      key.converter.schema.registry.url=http://schema-registry:8081
+      value.converter.schema.registry.url=http://schema-registry:8081
       plugin.path=/connectors
       listeners=http://0.0.0.0:8082
       config.storage.topic=worker-config
@@ -105,14 +107,18 @@ data:
       {
         "name": "cdc-local",
         "config": {
-         "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-         "database.hostname": "postgres.postgres",
-         "database.port": "5432",
-         "database.user": "cits",
-         "database.password": "admin",
-         "database.dbname": "postgres",
-         "database.server.name": "cdc",
-         "plugin.name": "wal2json"
+          "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+          "database.hostname": "postgres.postgres",
+          "database.port": "5432",
+          "database.user": "cits",
+          "database.password": "admin",
+          "database.dbname": "postgres",
+          "key.converter": "io.confluent.connect.json.JsonSchemaConverter",
+          "value.converter": "io.confluent.connect.json.JsonSchemaConverter",
+          "key.converter.schema.registry.url": "http://schema-registry:8081",
+          "value.converter.schema.registry.url": "http://schema-registry:8081",
+          "database.server.name": "cdc",
+          "plugin.name": "wal2json"
         }
       }
   sink_elastic.json: |
