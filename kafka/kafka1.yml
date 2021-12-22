@@ -92,7 +92,7 @@ spec:
       targetPort: 39091
   selector:
     run: kafka1
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
