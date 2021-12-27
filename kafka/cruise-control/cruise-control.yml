@@ -31,8 +31,11 @@ spec:
           command: ["/bin/sh"]
           args: ["-c", "/opt/cruise-control/kafka-cruise-control-start.sh /conf/cruisecontrol.properties 9090"]
           ports:
-            - name: cruise-control
+            - name: server
               containerPort: 9090
+              protocol: TCP
+            - name: ui
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -79,10 +82,14 @@ metadata:
   namespace: kafka
 spec:
   ports:
-    - name: inernal
+    - name: server
       port: 9090
       protocol: TCP
       targetPort: 9090
+    - name: ui
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
   selector:
     run: cruise-control
   type: LoadBalancer
