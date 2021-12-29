@@ -34,9 +34,6 @@ spec:
             - name: server
               containerPort: 9090
               protocol: TCP
-            - name: ui
-              containerPort: 8080
-              protocol: TCP
           livenessProbe:
             httpGet:
               port: 9090
@@ -59,7 +56,9 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext: {}
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
@@ -86,10 +85,6 @@ spec:
       port: 9090
       protocol: TCP
       targetPort: 9090
-    - name: ui
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
   selector:
     run: cruise-control
   type: LoadBalancer
@@ -304,7 +299,7 @@ data:
       # Whether CORS support is enabled for API or not
       webserver.http.cors.enabled=true
       # Value for Access-Control-Allow-Origin
-      webserver.http.cors.origin=http://localhost:8080/
+      # webserver.http.cors.origin=http://localhost:9090/
       # Value for Access-Control-Request-Method
       webserver.http.cors.allowmethods=OPTIONS,GET,POST
       # Headers that should be exposed to the Browser (Webapp)
@@ -312,7 +307,7 @@ data:
       # User Tasks subsystem and should be explicitly
       # Enabled when CORS mode is used as part of the
       # Admin Interface
-      webserver.http.cors.exposeheaders=User-Task-ID
+      webserver.http.cors.exposeheaders=User-Task-ID,Content-Type
       # REST API default prefix (dont forget the ending /*)
       webserver.api.urlprefix=/kafkacruisecontrol/*
       # Location where the Cruise Control frontend is deployed
