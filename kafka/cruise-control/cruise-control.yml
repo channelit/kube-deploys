@@ -297,7 +297,7 @@ data:
       # HTTP listen address
       webserver.http.address=0.0.0.0
       # Whether CORS support is enabled for API or not
-      webserver.http.cors.enabled=true
+      webserver.http.cors.enabled=false
       # Value for Access-Control-Allow-Origin
       # webserver.http.cors.origin=http://localhost:9090/
       # Value for Access-Control-Request-Method
