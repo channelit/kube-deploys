@@ -3,7 +3,6 @@
 #### Kubernetes Dashboard
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
-kubectl apply -f kubernetes-dashboard/dashboard-admin.yaml
 kubectl proxy
 ```
 ##### URL: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
@@ -12,6 +11,13 @@ kubectl proxy
 ```
 kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | awk '/^deployment-controller-token-/{print $1}') | awk '$1=="token:"{print $2}'
 ```
+
+###### Create Role and Get Token
+```
+kubectl apply -f kubernetes-dashboard/dashboard-admin.yaml
+kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount admin-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+```
+
 
 #### Install NGINX
 ```
