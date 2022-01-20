@@ -1,4 +1,4 @@
-#### Postgres Setup
+### Postgres Setup
 ```
 CREATE TABLE public.EMPLOYEE (
    ID VARCHAR PRIMARY KEY     NOT NULL,
@@ -20,19 +20,16 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 insert into public.employee values (uuid_generate_v1(),'demo2',100);
 insert into public.timesheet values (uuid_generate_v1(),'id,100, current_timestamp, 8);
 ```
-
-#### Create Streams
-
-##### Create EMPLOYEE Stream
+### Create Streams
+#### Create EMPLOYEE Stream
 ```
 CREATE STREAM employee WITH (kafka_topic='cdc.public.employee', format='JSON_SR');
 ```
-##### Create TIMESHEET Stream
+#### Create TIMESHEET Stream
 ```
 CREATE STREAM timesheet WITH (kafka_topic='cdc.public.timesheet', format='JSON_SR');
 ```
-
-##### Create Parsed Streams
+#### Create Parsed Streams
 ```
 CREATE OR REPLACE STREAM _employee AS 
 	SELECT
@@ -52,7 +49,6 @@ CREATE OR REPLACE STREAM _timesheet AS
 		FROM timesheet
 EMIT CHANGES;
 ```
-
 ### Join Streams
 ```
     SELECT
