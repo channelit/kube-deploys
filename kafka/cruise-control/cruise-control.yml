@@ -29,7 +29,8 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           command: ["/bin/sh"]
-          args: ["-c", "/opt/cruise-control/kafka-cruise-control-start.sh /conf/cruisecontrol.properties 9090"]
+          args: ["-c", "cp /conf/config.csv /opt/cruise-control/cruise-control-ui/dist/static/config.csv &&
+                        /opt/cruise-control/kafka-cruise-control-start.sh /conf/cruisecontrol.properties 9090"]
           ports:
             - name: server
               containerPort: 9090
@@ -38,7 +39,7 @@ spec:
             httpGet:
               port: 9090
               scheme: "HTTP"
-              path: "/kafkacruisecontrol/state"
+              path: "/cruisecontrol/api/state"
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 3
@@ -46,7 +47,7 @@ spec:
             httpGet:
               port: 9090
               scheme: "HTTP"
-              path: "/kafkacruisecontrol/state"
+              path: "/cruisecontrol/api/state"
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 3
@@ -68,6 +69,9 @@ spec:
           items:
           - key: "cruisecontrol.properties"
             path: "cruisecontrol.properties"
+            mode: 0755
+          - key: "config.csv"
+            path: "config.csv"
             mode: 0755
           - key: "capacityJBOD.json"
             path: "capacityJBOD.json"
@@ -309,7 +313,7 @@ data:
       # Admin Interface
       webserver.http.cors.exposeheaders=User-Task-ID,Content-Type
       # REST API default prefix (dont forget the ending /*)
-      webserver.api.urlprefix=/kafkacruisecontrol/*
+      webserver.api.urlprefix=/api/*
       # Location where the Cruise Control frontend is deployed
       webserver.ui.diskpath=./cruise-control-ui/dist/
       # URL path prefix for UI (dont forget the ending /*)
@@ -319,7 +323,7 @@ data:
       # Default Session Expiry Period
       webserver.session.maxExpiryTimeMs=60000
       # Session cookie path
-      webserver.session.path=/
+      webserver.session.path=/cruisecontrol
       # Server Access Logs
       webserver.accesslog.enabled=false
       # Location of HTTP Request Logs
@@ -349,3 +353,5 @@ data:
           }
         ]
       }
+  config.csv: |
+      dev,localhost,/cruisecontrol/api
