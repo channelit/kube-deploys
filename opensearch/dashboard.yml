@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: opensearch-dashboards
+  name: opensearch-dashboards
+  namespace: opensearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: opensearch-dashboards
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: opensearch-dashboards
+      labels:
+        run: opensearch-dashboards
+      namespace: opensearch
+    spec:
+      containers:
+        - image: opensearchproject/opensearch-dashboards:latest
+          imagePullPolicy: IfNotPresent
+          name: opensearch-dashboards
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: OPENSEARCH_HOSTS
+              value: '["https://opensearch1:9200","https://opensearch2:9200","https://opensearch3:9200"]'
+            - name: server.host
+              value: "0.0.0.0"
+          ports:
+            - name: publish
+              containerPort: 5601
+              protocol: TCP
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: opensearch-dashboards
+  name: opensearch-dashboards
+  namespace: opensearch
+spec:
+  ports:
+    - name: external
+      port: 5601
+      protocol: TCP
+      targetPort: 5601
+  selector:
+    run: opensearch-dashboards
+  type: LoadBalancer

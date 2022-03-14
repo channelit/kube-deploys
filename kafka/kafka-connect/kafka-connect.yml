@@ -67,6 +67,9 @@ spec:
             - key: "sink_elastic.json"
               path: "sink_elastic.json"
               mode: 0755              
+            - key: "sink_opensearch_aws.json"
+              path: "sink_opensearch_aws.json"
+              mode: 0755  
 ---
 apiVersion: v1
 kind: Service
@@ -139,5 +142,24 @@ data:
           "value.converter.schemas.enable": "false",
           "schema.ignore": "true",
           "key.ignore": "true"
+        }
+      }
+  sink_opensearch_aws.json: |
+      {
+        "name": "opensearch-aws-sink",
+        "config": {
+          "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+          "connection.url": "CONNECTION_URL",
+          "tasks.max": "1",
+          "topics": "cdc.public.employee",
+          "type.name": "opensearch-aws-sink",
+          "key.converter": "io.confluent.connect.json.JsonSchemaConverter",
+          "value.converter": "io.confluent.connect.json.JsonSchemaConverter",
+          "key.converter.schema.registry.url": "http://schema-registry:8081",
+          "value.converter.schema.registry.url": "http://schema-registry:8081",
+          "schema.ignore": "true",
+          "key.ignore": "true",
+          "connection.username": "CONNECTION_USERNAME",
+          "connection.password": "CONNECTION_PASSWORD"
         }
       }

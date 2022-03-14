@@ -30,19 +30,16 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: jboss/keycloak:latest
+        image: quay.io/keycloak/keycloak:17.0.0
         imagePullPolicy: Always
         env:
-          - name: KEYCLOAK_USER
+          - name: KEYCLOAK_ADMIN
             value: admin
-          - name: KEYCLOAK_PASSWORD
+          - name: KEYCLOAK_ADMIN_PASSWORD
             value: admin
-          - name: DB_VENDOR
-            value: h2
-          - name: KEYCLOAK_IMPORT
-            value: /keycloak/realm.json
-          - name: PROXY_ADDRESS_FORWARDING
-            value: "true"
+          # - name: KEYCLOAK_IMPORT
+          #   value: /keycloak/realm.json
+        args: ["start-dev"]
         volumeMounts:
           - name: keycloak-realm
             mountPath: /keycloak/realm.json
@@ -50,6 +47,10 @@ spec:
         ports:
           - containerPort: 8080
             protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /realms/master
+            port: 8080
       volumes:
         - name: keycloak-realm
           configMap:
