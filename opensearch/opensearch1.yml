@@ -72,6 +72,8 @@ spec:
               value: "0.0.0.0"
             - name: transport.port
               value: "9300"
+            - name: plugins.security.allow_unsafe_democertificates
+              value: "true"
             - name: OPENSEARCH_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
             - name: discovery.seed_hosts
