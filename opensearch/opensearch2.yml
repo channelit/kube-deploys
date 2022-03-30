@@ -42,6 +42,12 @@ spec:
           volumeMounts:
             - name: opensearch2-data
               mountPath: /usr/share/opensearch/data
+            - mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/config.yml
+              subPath: config.yml
+              name: security-config
+            - mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/generatecerts.sh
+              subPath: generatecerts.sh
+              name: security-config
           securityContext:
             privileged: true
             runAsUser: 0
@@ -88,6 +94,9 @@ spec:
           volumeMounts:
             - name: opensearch2-data
               mountPath: /usr/share/opensearch/data
+            - name: security-config
+              subPath: config.yml
+              mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/config.yml
           securityContext:
             privileged: true
             runAsUser: 1000
@@ -101,6 +110,14 @@ spec:
         - name: opensearch2-data
           persistentVolumeClaim:
             claimName: opensearch2-data-pvc
+        - name: security-config
+          configMap: 
+            name: opensearch-configmap
+            items:
+              - key: securityconfig.yml
+                path: config.yml
+              - key: generatecerts.sh
+                path: generatecerts.sh
 ---
 apiVersion: v1
 kind: Service
