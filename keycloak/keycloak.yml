@@ -13,7 +13,6 @@ metadata:
   name: keycloak
   namespace: keycloak
   labels:
-    name: keycloak
     app: keycloak
 spec:
   replicas: 1
@@ -23,10 +22,8 @@ spec:
   template:
     metadata:
       namespace: keycloak
-      name: keycloak
       labels:
         app: keycloak
-        name: keycloak
     spec:
       containers:
       - name: keycloak
@@ -65,7 +62,7 @@ metadata:
   name: keycloak
   namespace: keycloak
   labels:
-    name: keycloak
+    app: keycloak
 spec:
   ports:
   - name: keycloak
@@ -73,7 +70,7 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
-    name: keycloak
+    app: keycloak
   type: LoadBalancer
 ---
 apiVersion: v1
