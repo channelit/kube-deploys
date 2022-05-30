@@ -98,6 +98,9 @@ spec:
             - mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/generatecerts.sh
               subPath: generatecerts.sh
               name: security-config
+            - name: foo
+              mountPath: "/etc/foo"
+              readOnly: true
           securityContext:
             privileged: true
             runAsUser: 1000
@@ -117,9 +120,12 @@ spec:
             items:
               - key: securityconfig.yml
                 path: config.yml
-              - key: generatecerts.sh
-                path: generatecerts.sh
-                mode: 0777
+          - name: opensearch-certs
+            secret:
+              secretName: opensearch-certs
+              items:
+              - key: username
+                path: my-group/my-username
 ---
 apiVersion: v1
 kind: Service
