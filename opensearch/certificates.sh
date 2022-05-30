@@ -39,7 +39,7 @@ rm node3.csr
 rm client-key-temp.pem
 rm client.csr
 # Add Secrets
-kubectl create secret generic ssh-key-secret --from-file=admin-key=admin-key.pem --from-file=admin=admin.pem --from-file=client=client.pem --from-file=client-key=client-key.pem --from-file=node1=node1.pem --from-file=node1-key=node1-key.pem --from-file=node2=node2.pem --from-file=node2-key=node2-key.pem --from-file=node3=node3.pem --from-file=node3-key=node3-key.pem -n opensearch
+kubectl create secret generic ssh-key-secret --from-file=admin-key=admin-key.pem --from-file=admin=admin.pem --from-file=client=client.pem --from-file=client-key=client-key.pem --from-file=node1=node1.pem --from-file=node1-key=node1-key.pem --from-file=node2=node2.pem --from-file=node2-key=node2-key.pem --from-file=node3=node3.pem --from-file=node3-key=node3-key.pem --from-file=root-ca=root-ca.pem --from-file=root-ca-key=root-ca-key.pem --from-file=root-ca-srl=root-ca.srl -n opensearch
 # Cleanup
 rm admin.pem
 rm admin-key.pem
@@ -51,3 +51,6 @@ rm node2.pem
 rm node2-key.pem
 rm node3.pem
 rm node3-key.pem
+rm root-ca.pem
+rm root-ca.srl
+rm root-ca-key.pem
