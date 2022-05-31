@@ -97,6 +97,9 @@ spec:
             - name: security-config
               subPath: config.yml
               mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/config.yml
+            - name: opensearch-certs
+              mountPath: "/certs"
+              readOnly: true
           securityContext:
             privileged: true
             runAsUser: 1000
@@ -118,6 +121,36 @@ spec:
                 path: config.yml
               - key: generatecerts.sh
                 path: generatecerts.sh
+        - name: opensearch-certs
+          secret:
+            secretName: opensearch-certs
+            items:
+              - key: admin.pem
+                path: certs/admin.pem
+              - key: admin-key.pem
+                path: certs/admin-key.pem
+              - key: client.pem
+                path: certs/client.pem
+              - key: client-key.pem
+                path: certs/client-key.pem
+              - key: node1.pem
+                path: certs/node1.pem
+              - key: node1-key.pem
+                path: certs/node1-key.pem
+              - key: node2.pem
+                path: certs/node2.pem
+              - key: node2-key.pem
+                path: certs/node2-key.pem
+              - key: node3.pem
+                path: certs/node3.pem
+              - key: node3-key.pem
+                path: certs/node3-key.pem
+              - key: root-ca.pem
+                path: certs/root-ca.pem
+              - key: root-ca-key.pem
+                path: certs/root-ca-key.pem
+              - key: root-ca.srl
+                path: certs/root-ca.srl
 ---
 apiVersion: v1
 kind: Service
