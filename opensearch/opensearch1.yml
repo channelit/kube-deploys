@@ -101,6 +101,9 @@ spec:
             - name: opensearch-certs
               mountPath: "/certs"
               readOnly: true
+            - name: opensearch-node1-configmap
+              mountPath: /conf/opensearch.yml
+              subPath: opensearch.yml
           securityContext:
             privileged: true
             runAsUser: 1000
@@ -120,36 +123,42 @@ spec:
             items:
               - key: securityconfig.yml
                 path: config.yml
+        - name: opensearch-node1-configmap
+          configMap:
+            name: opensearch-node1-configmap
+            items:
+              - key: opensearch.yml
+                path: opensearch.yml
         - name: opensearch-certs
           secret:
             secretName: opensearch-certs
             items:
               - key: admin.pem
-                path: certs/admin.pem
+                path: admin.pem
               - key: admin-key.pem
-                path: certs/admin-key.pem
+                path: admin-key.pem
               - key: client.pem
-                path: certs/client.pem
+                path: client.pem
               - key: client-key.pem
-                path: certs/client-key.pem
+                path: client-key.pem
               - key: node1.pem
-                path: certs/node1.pem
+                path: node1.pem
               - key: node1-key.pem
-                path: certs/node1-key.pem
+                path: node1-key.pem
               - key: node2.pem
-                path: certs/node2.pem
+                path: node2.pem
               - key: node2-key.pem
-                path: certs/node2-key.pem
+                path: node2-key.pem
               - key: node3.pem
-                path: certs/node3.pem
+                path: node3.pem
               - key: node3-key.pem
-                path: certs/node3-key.pem
+                path: node3-key.pem
               - key: root-ca.pem
-                path: certs/root-ca.pem
+                path: root-ca.pem
               - key: root-ca-key.pem
-                path: certs/root-ca-key.pem
+                path: root-ca-key.pem
               - key: root-ca.srl
-                path: certs/root-ca.srl
+                path: root-ca.srl
 ---
 apiVersion: v1
 kind: Service
