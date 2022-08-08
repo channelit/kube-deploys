@@ -85,4 +85,4 @@ metadata:
   namespace: solr
 data:
   solr-entrypoint.sh: |
-      /opt/solr/bin/solr start -f -c -p 8983 -z $ZK_HOST/solr
+      /opt/solr/bin/solr start -f -c -m 1g -z $ZK_HOST/solr
