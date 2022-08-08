@@ -37,16 +37,23 @@ spec:
               value: solr1.solr
             - name: SOLR_PORT
               value: "8983"
+            - name: SOLR_ADMIN_UI_DISABLED
+              value: "false"
+            - name: SOLR_JETTY_HOST
+              value: "0.0.0.0"
           ports:
             - name: server
               containerPort: 8983
+              protocol: TCP
           volumeMounts:
             - name: solr1-configmap
               mountPath: /var/solr/conf
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext: {}
+      securityContext:
+        runAsUser: 8983
+        runAsGroup: 8983
       terminationGracePeriodSeconds: 30
       volumes:
         - name: solr1-configmap
@@ -93,7 +100,7 @@ data:
       /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost $ZK_HOST -cmd makepath /solr
       /opt/solr/bin/solr zk upconfig -n cit_default -d /opt/solr/server/solr/configsets/_default -z $ZK_HOST/solr -r
       /opt/solr/bin/solr zk cp file:/var/solr/conf/solr.xml zk:/solr/solr.xml -z $ZK_HOST
-      /opt/solr/bin/solr start -f -c -p 8983 -z $ZK_HOST/solr
+      /opt/solr/bin/solr start -f -c -m 1g -z $ZK_HOST/solr
   solr.xml: |
       <?xml version="1.0" encoding="UTF-8" ?>
       <solr>

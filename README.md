@@ -12,6 +12,8 @@ kubectl proxy
 kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | awk '/^deployment-controller-token-/{print $1}') | awk '$1=="token:"{print $2}'
 ```
 
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | awk '/^bootstrap-token-abcdef/{print $1}') | awk '$1=="token:"{print $2}'
+
 ###### Create Role and Get Token
 ```
 kubectl apply -f kubernetes-dashboard/dashboard-admin.yaml

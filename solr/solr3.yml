@@ -37,6 +37,10 @@ spec:
               value: solr3.solr
             - name: SOLR_PORT
               value: "8983"
+            - name: SOLR_ADMIN_UI_DISABLED
+              value: "true"
+            - name: SOLR_JETTY_HOST
+              value: "0.0.0.0"
           ports:
             - name: server
               containerPort: 8983
