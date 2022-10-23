@@ -5,7 +5,7 @@
 - Kubernetes deployment
 - Using Apache Kakfa downloaded from open source project
 - Separate namespaces for Kafka and Zookeeper
-- 3 node Zookeeper and 3 node Kafak
+- 3 node Zookeeper and 3 node Kafka
 * 
 
 ### Start Zookeeper cluster (from ../zookeeper)
@@ -24,7 +24,7 @@ kubectl apply -f ./ -n kafka
 zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/kafka
 ```
 
-### Kafdrop URL : 
+### Kafdrop URL : http://localhost:9001/
 
 ### Kafka Connect URL: http://localhost:8082/
 
