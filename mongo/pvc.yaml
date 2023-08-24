@@ -1,13 +1,26 @@
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata: 
-  name: mongo-pvc
-  namespace: mongo
-  labels: 
-    app: mongo
-spec: 
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 512Mi
   accessModes:
     - ReadWriteOnce
-  resources: 
-    requests: 
-      storage: 2Gi
+  hostPath:
+    path: /tmp/mongo-pv
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 512Mi
+  storageClassName: standard
+  volumeMode: Filesystem
+  volumeName: mongo-pv

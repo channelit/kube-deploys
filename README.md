@@ -10,6 +10,10 @@ kubectl proxy
 ```
 ##### URL: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
 
+### Connect to running container
+```
+kubectl exec --stdin --tty <pod_name> -- /bin/bash
+```
 
 #### Install NGINX
 ```
@@ -19,7 +23,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 
 #### Using GCP via Docker
 
-#### Create Kube Cluster
+##### Create Kube Cluster
 ```
 docker run -ti -d -e CLOUDSDK_CONFIG=/config/mygcloud -v `pwd`/mygcloud:/config/mygcloud -v `pwd`:/certs -v /Users/hardikpatel/workbench/projects/kube-deploys:/kube-deploys --name=gcloud google/cloud-sdk /bin/bash 
 docker run -ti -d -e CLOUDSDK_CONFIG=/config/mygcloud -v /Users/hardikpatel/workbench/projects/kube-deploys:/kube-deploys --name=gcloud google/cloud-sdk /bin/bash 
@@ -32,7 +36,7 @@ gcloud container clusters create cluster-cits --num-nodes=3
 gcloud container clusters get-credentials cluster-cits
 ```
 
-##### Reset Kubernetes Cluster
+#### Reset Local Kubernetes Cluster
 ```
 rm -rf ~/Library/Group\ Containers/group.com.docker/pki/
 rm -rf ~/.kube

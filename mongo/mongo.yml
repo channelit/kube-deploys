@@ -5,49 +5,56 @@ metadata:
   labels:
     name: mongo
 spec:
+  type: LoadBalancer
   ports:
     - name: "mongo"
       port: 27017
       targetPort: 27017
-  clusterIP: None
+  # clusterIP: None
   selector:
     role: mongo
 ---
 apiVersion: apps/v1
 kind: StatefulSet
-metadata: 
+metadata:
   name: mongo
 spec:
-  serviceName: "mongo" 
+  serviceName: mongo
   replicas: 2
-  selector: 
-    matchLabels: 
-      app: "mongo"
-  template: 
-    metadata: 
-      labels: 
-        app: "mongo"
-    spec: 
-      containers: 
-        - name: "mongo"
-          image: "mongo"
-          imagePullPolicy: "Always"
-          env: 
-            - name: "MONGO_INITDB_ROOT_USERNAME"
-              value: "admin"
-              
-            - name: "MONGO_INITDB_ROOT_PASSWORD"
-              value: "admin"
-              
-          ports: 
+  selector:
+    matchLabels:
+      role: mongo
+  template:
+    metadata:
+      labels:
+        role: mongo
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongo
+          image: mongo
+          args: ["--dbpath","/data/db"]
+          env:
+            - name: MONGODB_DATABASE
+              value: mongodb
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "mongouser1"
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: "adminpassword"
+          ports:
             - containerPort: 27017
-              name: "mongo"
-              
-          volumeMounts: 
-            - name: "mongo-persistent-storage"
-              mountPath: "/data/db"
-              
-      volumes: 
-        - name: "mongo-persistent-storage"
-          persistentVolumeClaim: 
-            claimName: "mongodb-pvc"
+          volumeMounts:
+            - name: mongo-pv
+              mountPath: /data/db
+      volumes:
+        - name: mongo-pv
+          # persistentVolumeClaim:
+          #   claimName: mongo-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-pvt
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 512Mi
