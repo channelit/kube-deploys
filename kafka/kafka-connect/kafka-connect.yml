@@ -29,10 +29,10 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          lifecycle:
-            postStart:
-              exec:
-                command: ["/bin/sh", "-c", "/conf/start-worker.sh"]
+          # lifecycle:
+          #   postStart:
+          #     exec:
+          #       command: ["/bin/sh", "-c", "/conf/start-worker.sh"]
           env:
             - name: CLASSPATH
               value: /connectors/*

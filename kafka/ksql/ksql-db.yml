@@ -22,7 +22,7 @@ spec:
         run: ksqldb-server
     spec:
       containers:
-        - image: ghcr.io/channelit/ksql:latest
+        - image: confluentinc/ksqldb-server:latest
           imagePullPolicy: Always
           name: ksqldb-server
           resources: {}
@@ -41,8 +41,6 @@ spec:
               value: http://schema-registry:8081
             - name: KSQL_KSQL_QUERY_PULL_TABLE_SCAN_ENABLED
               value: "true"
-          command: ["/bin/sh"]
-          args: ["-c", "/opt/ksql/bin/ksql-server-start /conf/ksql-server.properties"]
           ports:
             - name: ksqldb-server
               containerPort: 8088
@@ -65,7 +63,7 @@ spec:
             failureThreshold: 3
           volumeMounts:
             - name: ksql-server-properties
-              mountPath: /conf/ksql-server.properties
+              mountPath: /etc/ksqldb/ksql-server.properties
               subPath: ksql-server.properties
       dnsPolicy: ClusterFirst
       restartPolicy: Always
