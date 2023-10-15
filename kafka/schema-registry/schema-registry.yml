@@ -25,12 +25,18 @@ spec:
         - image: ghcr.io/channelit/kafka-confluent-community:latest
           imagePullPolicy: Always
           name: schema-registry
-          resources: {}
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          env:
-            - name: KAFKA_BROKER_CONNECT
-              value: kafka1:29091,kafka2:29092,kafka3:29093
+          # env:
+          #   - name: KAFKA_BROKER_CONNECT
+          #     value: kafka1:29091,kafka2:29092,kafka3:29093
           command: ["/bin/sh"]
           args: ["-c", "/opt/kafka/bin/schema-registry-start /conf/schema-registry.properties"]
           ports:
@@ -93,7 +99,7 @@ data:
   schema-registry.properties: |
       listeners=http://0.0.0.0:8081
       kafkastore.bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
-      kafkastore.connection.url=zoo1:2181,zoo2:2181,zoo3:2181
+      # kafkastore.connection.url=zoo1:2181,zoo2:2181,zoo3:2181
       kafkastore.topic=_schemas
       debug=true
   schema-postgres.json: |
