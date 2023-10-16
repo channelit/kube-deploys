@@ -27,11 +27,11 @@ spec:
           name: schema-registry
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "250m"
+              memory: "1Gi"
+              cpu: "1"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "1Gi"
+              cpu: "1"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           # env:
@@ -102,7 +102,7 @@ data:
       kafkastore.bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
       # kafkastore.connection.url=zoo1:2181,zoo2:2181,zoo3:2181
       kafkastore.topic=_schemas
-      kafkastore.topic.replication.facto=1
+      kafkastore.topic.replication.factor=3
       debug=false
   schema-postgres.json: |
       {
