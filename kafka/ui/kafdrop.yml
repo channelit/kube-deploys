@@ -27,11 +27,11 @@ spec:
           name: kafdrop
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "1Gi"
+              cpu: "1"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "2Gi"
+              cpu: "1"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           env:
