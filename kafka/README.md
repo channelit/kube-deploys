@@ -2,26 +2,22 @@
 ### Highlights
 
 * 
-- Kubernetes deployment
-- Using Apache Kakfa downloaded from open source project
-- Separate namespaces for Kafka and Zookeeper
-- 3 node Zookeeper and 3 node Kafka
+- Kubernetes deployment for Kafka broker with 3 nodes using open-source components
+- Apache Kakfa (RAFT)
+- ksqlDB (https://ksqldb.io)
+- Schema Registry (Confluent Community)
+- Apahce Kafka Connect
+- Kafdrop UI (https://github.com/obsidiandynamics/kafdrop)
 * 
 
-### Start Zookeeper cluster (from ../zookeeper)
-```
-kubectl create namespace zookeeper
-kubectl apply -f ./ -n zookeeper
-```
 
-### Start Kafka, Kafdrop, kafka-connect
+### Start Kafka, Kafdrop, kafka-connect, schema-registry
 ```
 kubectl create namespace kafka
 kubectl apply -f ./ -n kafka
-```
-#### CMAK url for ZK
-```
-zoo1.zookeeper.svc.cluster.local:2181,zoo2.zookeeper.svc.cluster.local:2181,zoo3.zookeeper.svc.cluster.local:2181/kafka
+kubectl apply -f schema-registry/. -n kafka
+kubectl apply -f ksql/. -n kafka
+kubectl apply -f ui/. -n kafka
 ```
 
 ### Kafdrop URL : http://localhost:9001/
@@ -36,7 +32,7 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
 
 ### Kafka Connect Sink for Elatic
 ```
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" -d @conf/elastic_sink.json http://34.139.102.126:8082/connectors/
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" -d @conf/elastic_sink.json http://localhost:8082/connectors/
 ```
 
 #### Delete Connector
@@ -47,7 +43,7 @@ curl -X DELETE http://localhost:8082/connectors/cdc-local
 
 ### Broker URL in Kubernetes
 ```
-kafka1.kafka.svc.cluster.local:39091,kafka2.kafka.svc.cluster.local:39092,kafka3.kafka.svc.cluster.local:39093
+kafka1.kafka.svc.cluster.local:9091,kafka2.kafka.svc.cluster.local:9092,kafka3.kafka.svc.cluster.local:9093
 
-localhost:39091,localhost:39092,localhost:39093
+localhost:9091,localhost:9092,localhost:9093
 ```
