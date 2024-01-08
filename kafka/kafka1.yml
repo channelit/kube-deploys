@@ -93,18 +93,14 @@ metadata:
   namespace: kafka
 spec:
   ports:
-    - name: inernal
-      port: 29091
-      protocol: TCP
-      targetPort: 29091
-    - name: external
+    - name: broker
       port: 9091
       protocol: TCP
       targetPort: 9091
-    - name: ui
-      port: 39091
+    - name: controller
+      port: 29091
       protocol: TCP
-      targetPort: 39091
+      targetPort: 29091
   selector:
     run: kafka1
   type: LoadBalancer
@@ -116,17 +112,27 @@ metadata:
   namespace: kafka
 data:
   server.properties: |
-      # broker.id=1
       node.id=1
-      process.roles=controller,broker
-      controller.quorum.voters=1@localhost:9091,2@0kafka2:9092,3@kafka3:9093
-      listeners=INTERNAL://0.0.0.0:29091,CONTROLLER://0.0.0.0:9091,UI://0.0.0.0:39091
-      listener.security.protocol.map=INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,UI:PLAINTEXT
-      advertised.listeners=INTERNAL://kafka1:29091,UI://kafka1:39091
-      inter.broker.listener.name=INTERNAL
+      process.roles=broker,controller
+      controller.quorum.voters=1@localhost:29091,2@0kafka2:29092,3@kafka3:29093
+      listeners=PLAINTEXT://0.0.0.0:9091,CONTROLLER://0.0.0.0:29091
+      listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+      advertised.listeners=PLAINTEXT://kafka1:9091
+      num.network.threads=3
+      num.io.threads=8
+      inter.broker.listener.name=PLAINTEXT
       controller.listener.names=CONTROLLER
-      offsets.topic.replication.factor=3
-      default.replication.factor=3
+      socket.send.buffer.bytes=10240
+      socket.receive.buffer.bytes=102400
+      socket.request.max.bytes=104857600
+      num.partitions=1
+      offsets.topic.replication.factor=1
+      num.recovery.threads.per.data.dir=1
+      transaction.state.log.replication.factor=1
+      transaction.state.log.min.isr=1
+      log.retention.hours=168
+      log.segment.bytes=1073741824
+      log.retention.check.interval.ms=300000
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
