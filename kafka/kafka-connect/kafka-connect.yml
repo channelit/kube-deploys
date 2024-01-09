@@ -97,7 +97,7 @@ metadata:
 data:
   worker.properties: |
       group.id=workers
-      bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
+      bootstrap.servers=kafka1:9091,kafka2:9092,kafka3:9093
       key.converter=io.confluent.connect.json.JsonSchemaConverter
       value.converter=io.confluent.connect.json.JsonSchemaConverter
       key.converter.schema.registry.url=http://schema-registry:8081

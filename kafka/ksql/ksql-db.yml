@@ -38,7 +38,7 @@ spec:
             - name: KSQL_LISTENERS
               value: http://0.0.0.0:8088
             - name: KSQL_BOOTSTRAP_SERVERS
-              value: kafka1:29091,kafka2:29092,kafka3:29093
+              value: kafka1:9091,kafka2:9092,kafka3:9093
             - name: KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE
               value: "true"
             - name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE
@@ -105,7 +105,7 @@ metadata:
   namespace: kafka
 data:
   ksql-server.properties: |
-      bootstrap.servers=kafka1:29091,kafka2:29092,kafka3:29093
+      bootstrap.servers=kafka1:9091,kafka2:9092,kafka3:9093
       compression.type=snappy
       group.id=ksql-connect-cluster
       ksql.query.pull.table.scan.enabled=true

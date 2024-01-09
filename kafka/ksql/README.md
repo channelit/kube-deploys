@@ -1,3 +1,14 @@
+### ksqlDB Cli
+```
+docker run --rm -it --name=ksqldb-cli --net=host confluentinc/ksqldb-cli /bin/sh
+ksql http://localhost:8088
+```
+
+### ksqlDB in Kubernetes
+```
+kubectl exec --stdin --tty podname -n kafka-- /bin/bash
+```
+
 ### Postgres
 ```
 CREATE TABLE public.EMPLOYEE (
