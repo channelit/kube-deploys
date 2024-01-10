@@ -101,6 +101,10 @@ spec:
       port: 29092
       protocol: TCP
       targetPort: 29092
+    - name: external
+      port: 39092
+      protocol: TCP
+      targetPort: 39092
   selector:
     run: kafka2
   type: LoadBalancer
@@ -115,9 +119,9 @@ data:
       node.id=2
       process.roles=broker,controller
       controller.quorum.voters=1@kafka1:29091,2@0localhost:29092,3@kafka3:29093
-      listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29092
-      listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
-      advertised.listeners=PLAINTEXT://kafka2:9092
+      listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29092,EXTERNAL://0.0.0.0:39092
+      listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL,EXTERNAL:PLAINTEXT
+      advertised.listeners=PLAINTEXT://kafka2:9092,EXTERNAL://localhost:39092
       num.network.threads=3
       num.io.threads=8
       inter.broker.listener.name=PLAINTEXT
