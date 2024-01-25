@@ -42,3 +42,9 @@ rm -rf ~/Library/Group\ Containers/group.com.docker/pki/
 rm -rf ~/.kube
 
 ```
+
+#### Create Image Pull Secret
+```
+kubectl create secret docker-registry regcred --docker-server=https://ghcr.io --docker-username=hardikgw@gmail.com --docker-password=$GITHUB_PASSKEY --docker-email=hardikgw@gmail.com -n <namespace>
+
+```

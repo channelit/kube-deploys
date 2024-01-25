@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: kafka1
+  name: kafka1
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: kafka1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: kafka1
+      labels:
+        run: kafka1
+    spec:
+      containers:
+        - image: ghcr.io/channelit/kafka:latest
+          imagePullPolicy: Always
+          name: kafka1
+          command: ["/bin/sh", "-c"]
+          # args: ["export KAFKA_CLUSTER_ID=\"$(/opt/kafka/bin/kafka-storage.sh random-uuid)\"; /opt/kafka/bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c /conf/server.properties; /opt/kafka/bin/kafka-server-start.sh /conf/server.properties"]
+          # args: ["/opt/kafka/bin/kafka-storage.sh format --ignore-formatted -t $(/opt/kafka/bin/kafka-storage.sh random-uuid) -c /conf/server.properties; /opt/kafka/bin/kafka-server-start.sh /conf/server.properties"]
+          args: ["/opt/kafka/bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c /conf/server.properties; /opt/kafka/bin/kafka-server-start.sh /conf/server.properties"]
+          resources:
+            requests:
+              memory: "1G"
+              cpu: "500m"
+            limits:
+              memory: "1G"
+              cpu: "500m"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          env:
+            - name: JMX_PORT
+              value: "9998"
+            - name: KAFKA_CLUSTER_ID
+              value: o8hZC38eROOUpiucL9DbTA
+          ports:
+            - name: server1
+              containerPort: 29091
+              protocol: TCP
+            - name: server2
+              containerPort: 29092
+              protocol: TCP
+            - name: server3
+              containerPort: 29093
+              protocol: TCP
+            - name: client1
+              containerPort: 9091
+              protocol: TCP
+            - name: client2
+              containerPort: 9092
+              protocol: TCP
+            - name: client3
+              containerPort: 9093
+              protocol: TCP
+            - name: client-outside
+              containerPort: 30091
+              protocol: TCP
+          volumeMounts:
+            - name: kafka1-volume
+              mountPath: /conf/server.properties
+              subPath: server.properties
+            # - name: kafka1-logs
+            #   mountPath: /kafka-logs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: kafka1-volume
+          configMap:
+            name: kafka1-config
+        # - name: kafka1-logs
+        #   persistentVolumeClaim:
+        #     claimName: kafka1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: kafka1
+  name: kafka1
+  namespace: kafka
+spec:
+  ports:
+    - name: broker
+      port: 9091
+      protocol: TCP
+      targetPort: 9091
+    - name: controller
+      port: 29091
+      protocol: TCP
+      targetPort: 29091
+    - name: external
+      port: 39091
+      protocol: TCP
+      targetPort: 39091
+  selector:
+    run: kafka1
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka1-config
+  namespace: kafka
+data:
+  server.properties: |
+      node.id=1
+      process.roles=broker,controller
+      controller.quorum.voters=1@localhost:29091,2@0kafka2:29092,3@kafka3:29093
+      listeners=PLAINTEXT://0.0.0.0:9091,CONTROLLER://0.0.0.0:29091,EXTERNAL://0.0.0.0:39091
+      listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL,EXTERNAL:PLAINTEXT
+      advertised.listeners=PLAINTEXT://kafka1:9091,EXTERNAL://localhost:39091
+      num.network.threads=3
+      num.io.threads=8
+      inter.broker.listener.name=PLAINTEXT
+      controller.listener.names=CONTROLLER
+      socket.send.buffer.bytes=10240
+      socket.receive.buffer.bytes=102400
+      socket.request.max.bytes=104857600
+      num.partitions=1
+      offsets.topic.replication.factor=1
+      num.recovery.threads.per.data.dir=1
+      transaction.state.log.replication.factor=1
+      transaction.state.log.min.isr=1
+      log.retention.hours=168
+      log.segment.bytes=1073741824
+      log.retention.check.interval.ms=300000
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: kafka1
+#   labels:
+#     run: kafka1
+#   namespace: kafka
+# spec:
+#   storageClassName: hostpath
+#   capacity:
+#     storage: 512Mi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: "/Users/hardikpatel/workbench/projects/kube-deploys/kafka/data/kafka1"
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: kafka1
+#   namespace: kafka
+# spec:
+#   storageClassName: hostpath
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 512Mi
