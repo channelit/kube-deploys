@@ -27,40 +27,42 @@ spec:
           name: kafka-ui
           resources:
             requests:
-              memory: "1024M"
-              cpu: "800m"
+              memory: "1024Mi"
+              cpu: "400m"
             limits:
-              memory: "1024M"
-              cpu: "1000m"
+              memory: "1024Mi"
+              cpu: "400m"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          command: ["java", "-jar"]
+          command: ["java", "-Dspring.config.additional-location=/config/config.yml", "-jar"]
           args: ["/opt/kafka-ui/kafka-ui.jar"]
           env:
-            - name: KAFKA_CLUSTERS_0_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-ui-config
-                  key: KAFKA_CLUSTERS_0_NAME
-            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-ui-config
-                  key: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
-            - name: AUTH_TYPE
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-ui-config
-                  key: AUTH_TYPE
-            - name: MANAGEMENT_HEALTH_LDAP_ENABLED
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-ui-config
-                  key: MANAGEMENT_HEALTH_LDAP_ENABLED
+            - name: MY_CLUSTER
+              value: hello_world
           ports:
             - name: ui
               containerPort: 8080
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: 8080
+              scheme: "HTTP"
+              path: "/actuator/health"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              port: 8080
+              scheme: "HTTP"
+              path: "/actuator/health"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          volumeMounts:
+              - name: kafka-ui-config-yml
+                mountPath: /config
+                readOnly: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -70,6 +72,13 @@ spec:
         - name: kafka-ui-config
           configMap:
             name: kafka-ui-config
+        - name: kafka-ui-config-yml
+          configMap:
+            name: kafka-ui-config
+            items:
+                - key: "config.yml"
+                  path: "config.yml"
+                  mode: 0777
       imagePullSecrets:
       - name: regcred
 ---
@@ -97,8 +106,10 @@ metadata:
   name: kafka-ui-config
   namespace: kafka
 data:
-  KAFKA_CLUSTERS_0_NAME: "local"
-  KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka1:9091,kafka2:9092,kafka3:9093"
-  KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "http://schema-registry:8081"
-  AUTH_TYPE: "DISABLED"
-  MANAGEMENT_HEALTH_LDAP_ENABLED: "FALSE"
+  config.yml: |
+    kafka:
+      clusters:
+        - 
+          name: ${MY_CLUSTER}
+          bootstrapServers: kafka1:9091,kafka2:9092,kafka3:9093
+          schemaRegistry: http://schema-registry:8081
