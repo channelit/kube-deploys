@@ -41,11 +41,11 @@ spec:
               value: hello_world
           ports:
             - name: ui
-              containerPort: 8080
+              containerPort: 9000
               protocol: TCP
           livenessProbe:
             httpGet:
-              port: 8080
+              port: 9000
               scheme: "HTTP"
               path: "/actuator/health"
             initialDelaySeconds: 30
@@ -53,7 +53,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              port: 8080
+              port: 9000
               scheme: "HTTP"
               path: "/actuator/health"
             initialDelaySeconds: 30
@@ -92,9 +92,9 @@ metadata:
 spec:
   ports:
     - name: kafka-ui
-      port: 8080
+      port: 9000
       protocol: TCP
-      targetPort: 8080
+      targetPort: 9000
   selector:
     run: kafka-ui
   sessionAffinity: None
@@ -107,9 +107,25 @@ metadata:
   namespace: kafka
 data:
   config.yml: |
+    server:
+      port: 9000
     kafka:
       clusters:
         - 
           name: ${MY_CLUSTER}
           bootstrapServers: kafka1:9091,kafka2:9092,kafka3:9093
           schemaRegistry: http://schema-registry:8081
+    auth:
+      type: OAUTH2
+      oauth2:
+        client:
+          keycloak:
+            clientId: kafka-ui
+            clientSecret: XfZKTgiZHaH4EEeAyVOzrtrye3OQ76rz
+            scope: openid
+            issuer-uri: http://keycloak.keycloak:8080/realms/kafka-ui
+            user-name-attribute: preferred_username
+            client-name: kafka-ui
+            provider: keycloak
+            custom-params:
+              type: keycloak
