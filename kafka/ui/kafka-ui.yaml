@@ -115,17 +115,19 @@ data:
           name: ${MY_CLUSTER}
           bootstrapServers: kafka1:9091,kafka2:9092,kafka3:9093
           schemaRegistry: http://schema-registry:8081
-    auth:
-      type: OAUTH2
-      oauth2:
-        client:
-          keycloak:
-            clientId: kafka-ui
-            clientSecret: XfZKTgiZHaH4EEeAyVOzrtrye3OQ76rz
-            scope: openid
-            issuer-uri: http://keycloak.keycloak:8080/realms/kafka-ui
-            user-name-attribute: preferred_username
-            client-name: kafka-ui
-            provider: keycloak
-            custom-params:
-              type: keycloak
+    # Create realm in keycloak to use this and set values accordingly
+    # Comment/uncomment out following lines to disable/enable auth
+    # auth:
+    #   type: OAUTH2
+    #   oauth2:
+    #     client:
+    #       keycloak:
+    #         clientId: kafka-ui
+    #         clientSecret: XfZKTgiZHaH4EEeAyVOzrtrye3OQ76rz
+    #         scope: openid
+    #         issuer-uri: http://keycloak.keycloak:8080/realms/kafka-ui
+    #         user-name-attribute: preferred_username
+    #         client-name: kafka-ui
+    #         provider: keycloak
+    #         custom-params:
+    #           type: keycloak

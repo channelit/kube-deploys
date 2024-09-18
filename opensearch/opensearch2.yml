@@ -82,6 +82,8 @@ spec:
               value: "opensearch1,opensearch2,opensearch3"
             - name: cluster.initial_master_nodes
               value: "opensearch1,opensearch2,opensearch3"
+            - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+              value: "Jumbo4Mombo"
             # - name: discovery.type
             #   value: "single-node"
           ports:
