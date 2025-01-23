@@ -84,6 +84,8 @@ spec:
               value: "opensearch1,opensearch2,opensearch3"
             - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
               value: "Jumbo4Mombo"
+            - name: _JAVA_OPTIONS
+              value: "-XX:UseSVE=0"
             # - name: discovery.type
             #   value: "single-node"
           ports:
