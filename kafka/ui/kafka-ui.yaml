@@ -37,8 +37,8 @@ spec:
           command: ["java", "-Dspring.config.additional-location=/config/config.yml", "-jar"]
           args: ["/opt/kafka-ui/kafka-ui.jar"]
           env:
-            - name: MY_CLUSTER
-              value: hello_world
+            - name: CLUSTER_NAME
+              value: cluster_1
           ports:
             - name: ui
               containerPort: 9000
@@ -103,18 +103,31 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: kafka-ui-config-env
+  namespace: kafka
+data:
+  KAFKA_CLUSTER_0_NAME: ${CLUSTER_NAME}
+  KAFKA_CLUSTER_0_BOOTSTRAPSERVERS: kafka1:9091,kafka2:9092,kafka3:9093
+  KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_PLAINTEXT
+  KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
+  KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";'
+  SPRING_CONFIG_ADDITIONAL-LOCATION: /config/config.yml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: kafka-ui-config
   namespace: kafka
 data:
   config.yml: |
     server:
       port: 9000
-    kafka:
-      clusters:
-        - 
-          name: ${MY_CLUSTER}
-          bootstrapServers: kafka1:9091,kafka2:9092,kafka3:9093
-          schemaRegistry: http://schema-registry:8081
+    # kafka:
+      # clusters:
+      #   - 
+      #     name: ${CLUSTER_NAME}
+      #     bootstrapServers: kafka1:9091,kafka2:9092,kafka3:9093
+      #     schemaRegistry: http://schema-registry:8081
     # Create realm in keycloak to use this and set values accordingly
     # Comment/uncomment out following lines to disable/enable auth
     # auth:

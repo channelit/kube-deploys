@@ -43,6 +43,8 @@ spec:
               value: "9998"
             - name: KAFKA_CLUSTER_ID
               value: o8hZC38eROOUpiucL9DbTA
+            - name: KAFKA_OPTS
+              value: -Djava.security.auth.login.config=/conf/jaas.config
           ports:
             - name: server1
               containerPort: 29091
@@ -67,8 +69,8 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: kafka1-volume
-              mountPath: /conf/server.properties
-              subPath: server.properties
+              mountPath: /conf
+              readOnly: true
             # - name: kafka1-logs
             #   mountPath: /kafka-logs
       dnsPolicy: ClusterFirst
@@ -80,6 +82,11 @@ spec:
         - name: kafka1-volume
           configMap:
             name: kafka1-config
+            items:
+              - key: "server.properties"
+                path: "server.properties"
+              - key: "jaas.config"
+                path: "jaas.config"
         # - name: kafka1-logs
         #   persistentVolumeClaim:
         #     claimName: kafka1
@@ -119,12 +126,23 @@ data:
       node.id=1
       process.roles=broker,controller
       controller.quorum.voters=1@localhost:29091,2@0kafka2:29092,3@kafka3:29093
-      listeners=PLAINTEXT://0.0.0.0:9091,CONTROLLER://0.0.0.0:29091,EXTERNAL://0.0.0.0:39091
+      listeners=SASL_SSL://0.0.0.0:9091,CONTROLLER://0.0.0.0:29091,EXTERNAL://0.0.0.0:39091
       listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL,EXTERNAL:PLAINTEXT
-      advertised.listeners=PLAINTEXT://kafka1:9091,CONTROLLER://kafka1:29091,EXTERNAL://localhost:39091
+      advertised.listeners=SASL_SSL://kafka1:9091,CONTROLLER://kafka1:29091,EXTERNAL://localhost:39091
+      listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
+          username="admin" \
+          password="admin-secret";
+      listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+          username="admin" \
+          password="admin-secret" \
+          user_admin="admin-secret" \
+          user_alice="alice-secret";
+      security.inter.broker.protocol=SASL_SSL
+      sasl.mechanism.inter.broker.protocol=PLAIN
+      sasl.enabled.mechanisms=PLAIN
+      ssl.endpoint.identification.algorithm =
       num.network.threads=3
       num.io.threads=8
-      inter.broker.listener.name=PLAINTEXT
       controller.listener.names=CONTROLLER
       socket.send.buffer.bytes=10240
       socket.receive.buffer.bytes=102400
@@ -137,6 +155,14 @@ data:
       log.retention.hours=168
       log.segment.bytes=1073741824
       log.retention.check.interval.ms=300000
+  jaas.config: |
+      KafkaServer {
+        org.apache.kafka.common.security.scram.ScramLoginModule required
+        username="admin"
+        password="admin-secret"
+        serviceName="kafka";
+      };
+
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
