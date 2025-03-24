@@ -126,23 +126,25 @@ data:
       node.id=3
       process.roles=broker,controller
       controller.quorum.voters=1@kafka1:29091,2@0kafka2:29092,3@localhost:29093
-      listeners=SASL_SSL://0.0.0.0:9093,CONTROLLER://0.0.0.0:29093,EXTERNAL://0.0.0.0:39093
-      listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL,EXTERNAL:PLAINTEXT
-      advertised.listeners=SASL_SSL://kafka3:9093,CONTROLLER://kafka3:29093,EXTERNAL://localhost:39093
-      listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
-          username="admin" \
-          password="admin-secret";
-      listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+      listeners=BROKER://0.0.0.0:9093,CONTROLLER://0.0.0.0:29093,EXTERNAL://0.0.0.0:39093
+      listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,BROKER:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
+      advertised.listeners=BROKER://kafka3:9093,CONTROLLER://kafka3:29093
+      listener.name.broker.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
           username="admin" \
           password="admin-secret" \
           user_admin="admin-secret" \
-          user_alice="alice-secret";
-      security.inter.broker.protocol=SASL_SSL
+          user_broker="broker-secret";
+      listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+          username="admin" \
+          password="admin-secret" \
+          user_admin="admin-secret" \
+          user_broker="broker-secret";
       sasl.mechanism.inter.broker.protocol=PLAIN
       sasl.enabled.mechanisms=PLAIN
       ssl.endpoint.identification.algorithm=
       num.network.threads=3
       num.io.threads=8
+      inter.broker.listener.name=BROKER
       controller.listener.names=CONTROLLER
       socket.send.buffer.bytes=10240
       socket.receive.buffer.bytes=102400
@@ -157,11 +159,14 @@ data:
       log.retention.check.interval.ms=300000
   jaas.config: |
       KafkaServer {
-        org.apache.kafka.common.security.scram.ScramLoginModule required
+        org.apache.kafka.common.security.plain.PlainLoginModule required
         username="admin"
         password="admin-secret"
-        serviceName="kafka";
+        user_admin="admin-secret"
+        user_broker="broker-secret"
+        serviceName="kafka3";
       };
+
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
