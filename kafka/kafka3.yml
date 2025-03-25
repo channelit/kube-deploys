@@ -43,8 +43,8 @@ spec:
               value: "9998"
             - name: KAFKA_CLUSTER_ID
               value: o8hZC38eROOUpiucL9DbTA
-            - name: KAFKA_OPTS
-              value: -Djava.security.auth.login.config=/conf/jaas.config
+            # - name: KAFKA_OPTS
+            #   value: -Djava.security.auth.login.config=/conf/jaas.config
           ports:
             - name: server1
               containerPort: 29091
@@ -126,21 +126,13 @@ data:
       node.id=3
       process.roles=broker,controller
       controller.quorum.voters=1@kafka1:29091,2@0kafka2:29092,3@localhost:29093
-      listeners=BROKER://0.0.0.0:9093,CONTROLLER://0.0.0.0:29093,EXTERNAL://0.0.0.0:39093
+      listeners=BROKER://0.0.0.0:9093,CONTROLLER://127.0.0.1:29093,EXTERNAL://0.0.0.0:39093
       listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,BROKER:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
       advertised.listeners=BROKER://kafka3:9093,CONTROLLER://kafka3:29093
-      listener.name.broker.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="admin" \
-          password="admin-secret" \
-          user_admin="admin-secret" \
-          user_broker="broker-secret";
-      listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="admin" \
-          password="admin-secret" \
-          user_admin="admin-secret" \
-          user_broker="broker-secret";
-      sasl.mechanism.inter.broker.protocol=PLAIN
-      sasl.enabled.mechanisms=PLAIN
+      listener.name.broker.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
+      listener.name.controller.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
+      sasl.mechanism.inter.broker.protocol=SCRAM-SHA-512
+      sasl.enabled.mechanisms=SCRAM-SHA-512
       ssl.endpoint.identification.algorithm=
       num.network.threads=3
       num.io.threads=8
@@ -157,14 +149,12 @@ data:
       log.retention.hours=168
       log.segment.bytes=1073741824
       log.retention.check.interval.ms=300000
+      early.start.listeners=CONTROLLER
+      super.users=User:admin
+      allow.everyone.if.no.acl.found=true
   jaas.config: |
       KafkaServer {
-        org.apache.kafka.common.security.plain.PlainLoginModule required
-        username="admin"
-        password="admin-secret"
-        user_admin="admin-secret"
-        user_broker="broker-secret"
-        serviceName="kafka3";
+        org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret" serviceName="kafka3";
       };
 
 # ---

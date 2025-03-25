@@ -126,19 +126,11 @@ data:
       node.id=1
       process.roles=broker,controller
       controller.quorum.voters=1@localhost:29091,2@0kafka2:29092,3@kafka3:29093
-      listeners=BROKER://0.0.0.0:9091,CONTROLLER://0.0.0.0:29091,EXTERNAL://0.0.0.0:39091
+      listeners=BROKER://0.0.0.0:9091,CONTROLLER://127.0.0.1:29091,EXTERNAL://0.0.0.0:39091
       listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,BROKER:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
       advertised.listeners=BROKER://kafka1:9091,CONTROLLER://kafka1:29091,EXTERNAL://localhost:39091
-      listener.name.broker.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="admin" \
-          password="admin-secret" \
-          user_admin="admin-secret" \
-          user_broker="broker-secret";
-      listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="admin" \
-          password="admin-secret" \
-          user_admin="admin-secret" \
-          user_broker="broker-secret";
+      listener.name.broker.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
+      listener.name.controller.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
       sasl.mechanism.inter.broker.protocol=PLAIN
       sasl.enabled.mechanisms=PLAIN
       ssl.endpoint.identification.algorithm =
@@ -157,14 +149,13 @@ data:
       log.retention.hours=168
       log.segment.bytes=1073741824
       log.retention.check.interval.ms=300000
+      authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      early.start.listeners=CONTROLLER
+      super.users=User:admin
+      allow.everyone.if.no.acl.found=true
   jaas.config: |
       KafkaServer {
-        org.apache.kafka.common.security.plain.PlainLoginModule required
-        username="admin"
-        password="admin-secret"
-        user_admin="admin-secret"
-        user_broker="broker-secret"
-        serviceName="kafka1";
+        org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" serviceName="kafka1";
       };
 
 # ---
