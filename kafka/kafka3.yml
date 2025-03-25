@@ -137,6 +137,9 @@ data:
       log.retention.hours=168
       log.segment.bytes=1073741824
       log.retention.check.interval.ms=300000
+      authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer 
+      early.start.listeners=CONTROLLER
+      allow.everyone.if.no.acl.found=true
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
