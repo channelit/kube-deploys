@@ -113,3 +113,7 @@ data:
       clusters:
         - bootstrapServers: ckafka:9092
           name: ckafka
+          properties:
+            security.protocol: SASL_SSL
+            sasl.mechanism: SCRAM-SHA-512
+            sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret";
