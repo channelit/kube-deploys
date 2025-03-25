@@ -111,22 +111,5 @@ data:
       port: 9000
     kafka:
       clusters:
-        - 
-          name: ${MY_CLUSTER}
-          bootstrapServers: confluent-kafka:9092
-    # Create realm in keycloak to use this and set values accordingly
-    # Comment/uncomment out following lines to disable/enable auth
-    # auth:
-    #   type: OAUTH2
-    #   oauth2:
-    #     client:
-    #       keycloak:
-    #         clientId: kafka-ui
-    #         clientSecret: XfZKTgiZHaH4EEeAyVOzrtrye3OQ76rz
-    #         scope: openid
-    #         issuer-uri: http://keycloak.keycloak:8080/realms/kafka-ui
-    #         user-name-attribute: preferred_username
-    #         client-name: kafka-ui
-    #         provider: keycloak
-    #         custom-params:
-    #           type: keycloak
+        - bootstrapServers: ckafka:9092
+          name: ckafka
