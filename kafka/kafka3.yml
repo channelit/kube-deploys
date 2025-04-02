@@ -128,9 +128,9 @@ data:
       controller.quorum.voters=1@kafka1:29091,2@0kafka2:29092,3@localhost:29093
       listeners=BROKER://0.0.0.0:9093,CONTROLLER://0.0.0.0:29093,EXTERNAL://0.0.0.0:39093
       listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,BROKER:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
-      advertised.listeners=BROKER://kafka3:9093,CONTROLLER://kafka3:29093
-      listener.name.broker.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
-      listener.name.controller.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
+      advertised.listeners=BROKER://kafka3:9093,CONTROLLER://kafka3:29093,EXTERNAL://localhost:39093
+      listener.name.sasl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
+      listener.name.controller.sasl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
       sasl.mechanism.inter.broker.protocol=PLAIN
       sasl.enabled.mechanisms=PLAIN
       num.network.threads=3
@@ -153,7 +153,7 @@ data:
       allow.everyone.if.no.acl.found=true
   jaas.config: |
       KafkaServer {
-        org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret" serviceName="kafka3";
+        org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret" serviceName="akafka";
       };
 
 # ---
