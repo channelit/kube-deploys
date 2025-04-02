@@ -131,9 +131,8 @@ data:
       advertised.listeners=BROKER://kafka2:9092,CONTROLLER://kafka2:29092,EXTERNAL://localhost:39092
       listener.name.broker.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
       listener.name.controller.sasl.plaintext.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret" user_admin="admin-secret" user_broker="broker-secret";
-      sasl.mechanism.inter.broker.protocol=SCRAM-SHA-512
-      sasl.enabled.mechanisms=SCRAM-SHA-512
-      ssl.endpoint.identification.algorithm=
+      sasl.mechanism.inter.broker.protocol=PLAIN
+      sasl.enabled.mechanisms=PLAIN
       num.network.threads=3
       num.io.threads=8
       inter.broker.listener.name=BROKER
