@@ -124,4 +124,5 @@ data:
   KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_PLAINTEXT
   KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
   KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";'
-  SPRING_CONFIG_ADDITIONAL_LOCATION: /config/config.yml
+  KAFKA_CLUSTERS_0_SCHEMAREGISTRYL: http:/schema-registry:8081
+  KSPRING_CONFIG_ADDITIONAL_LOCATION: /config/config.yml
